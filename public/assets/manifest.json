@@ -1,0 +1,159 @@
+{
+  "version": "0.2.0",
+  "assets": [
+    {
+      "id": "shore-ground",
+      "category": "terrain",
+      "zone": "shore",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 5000,
+      "textureBudget": "2048x2048",
+      "proxyType": "displaced-plane",
+      "description": "Beach terrain with subtle sand undulation"
+    },
+    {
+      "id": "shore-ocean",
+      "category": "terrain",
+      "zone": "shore",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 3600,
+      "textureBudget": "none",
+      "proxyType": "vertex-animated-plane",
+      "description": "Ocean surface with 3-layer wave animation and depth vertex colors"
+    },
+    {
+      "id": "shore-gate-of-names",
+      "category": "landmark",
+      "zone": "shore",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 10000,
+      "textureBudget": "2048x2048",
+      "proxyType": "composed-primitives",
+      "description": "Monumental stone archway with circuit traces and inscription panel"
+    },
+    {
+      "id": "shore-mode-orb-story",
+      "category": "interactive",
+      "zone": "shore",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 200,
+      "textureBudget": "none",
+      "proxyType": "octahedron-geometry",
+      "description": "Gold floating orb — selects Story Mode"
+    },
+    {
+      "id": "shore-mode-orb-explore",
+      "category": "interactive",
+      "zone": "shore",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 200,
+      "textureBudget": "none",
+      "proxyType": "octahedron-geometry",
+      "description": "Blue floating orb — selects Explore Mode"
+    },
+    {
+      "id": "shore-buried-column",
+      "category": "env-kit",
+      "zone": "shore",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 500,
+      "textureBudget": "1024x1024",
+      "proxyType": "cylinder-geometry",
+      "description": "Half-buried classical column, tilted in sand"
+    },
+    {
+      "id": "shore-steps",
+      "category": "env-kit",
+      "zone": "shore",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 300,
+      "textureBudget": "1024x1024",
+      "proxyType": "box-array",
+      "description": "7 stone steps from beach to gate platform"
+    },
+    {
+      "id": "shore-beacon",
+      "category": "landmark",
+      "zone": "shore",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 500,
+      "textureBudget": "512x512",
+      "proxyType": "box-geometry",
+      "description": "Distant beacon tower silhouette with pulsing gold light"
+    },
+    {
+      "id": "shore-path",
+      "category": "env-kit",
+      "zone": "shore",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 200,
+      "textureBudget": "1024x1024",
+      "proxyType": "plane-geometry",
+      "description": "34m stone path from gate toward inland with border stones"
+    },
+    {
+      "id": "column-doric",
+      "category": "env-kit",
+      "zone": "shared",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 2000,
+      "textureBudget": "1024x1024",
+      "proxyType": "cylinder-geometry",
+      "description": "Classical Doric column, reusable across zones"
+    },
+    {
+      "id": "atelier-ground",
+      "category": "terrain",
+      "zone": "atelier",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 200,
+      "textureBudget": "none",
+      "proxyType": "plane-geometry",
+      "description": "Atelier floor plane"
+    },
+    {
+      "id": "atelier-workbench",
+      "category": "landmark",
+      "zone": "atelier",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 10000,
+      "textureBudget": "2048x2048",
+      "proxyType": "composed-primitives",
+      "description": "Central workbench — Renaissance crafting table"
+    },
+    {
+      "id": "atelier-portfolio-crystal",
+      "category": "interactive",
+      "zone": "atelier",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 500,
+      "textureBudget": "512x512",
+      "proxyType": "octahedron-geometry",
+      "description": "Floating crystal — opens project portfolio overlay"
+    },
+    {
+      "id": "atelier-about-tablet",
+      "category": "interactive",
+      "zone": "atelier",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 500,
+      "textureBudget": "512x512",
+      "proxyType": "box-geometry",
+      "description": "Stone tablet — opens about overlay"
+    }
+  ]
+}

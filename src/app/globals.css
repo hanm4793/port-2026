@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+:root {
+  --background: #1A1816;
+  --foreground: #F5F0E6;
+  --accent: #C9A84C;
+  --muted: #A89E8E;
+  --border: #3A3632;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Reset */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans, system-ui, sans-serif);
+  overflow-x: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * Content layer — floats ABOVE the 3D canvas but
+ * pointer-events pass through to the canvas by default.
+ * Only interactive HTML elements (buttons, links) capture events.
+ */
+.content-layer {
+  position: relative;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Only specific interactive elements receive pointer events */
+.content-layer a,
+.content-layer button,
+.content-layer input,
+.content-layer textarea,
+.content-layer select,
+.content-layer [data-interactive] {
+  pointer-events: auto;
+}
