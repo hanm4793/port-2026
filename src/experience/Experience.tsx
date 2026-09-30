@@ -15,6 +15,7 @@ import { Lighting } from './environment/Lighting';
 import { Fog } from './environment/Fog';
 import { ShoreZone } from './zones/shore/ShoreZone';
 import { ForumZone } from './zones/forum/ForumZone';
+import { DinoSanctuaryZone } from './zones/sanctuary/DinoSanctuaryZone';
 import { StoryCameraRail } from './story/StoryCameraRail';
 import { CAMERA_NEAR, CAMERA_FAR } from '@/lib/constants';
 import { SHORE_CAMERAS } from './zones/shore/shoreConfig';
@@ -70,6 +71,7 @@ export function Experience() {
 
         <ShoreZone />
         <ForumZone />
+        <DinoSanctuaryZone />
 
         {/* Story Mode: scroll-driven camera rail */}
         {mode === 'story' && <StoryCameraRail />}

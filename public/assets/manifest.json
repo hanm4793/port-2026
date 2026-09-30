@@ -154,6 +154,39 @@
       "textureBudget": "512x512",
       "proxyType": "box-geometry",
       "description": "Stone tablet — opens about overlay"
+    },
+    {
+      "id": "sanctuary-fossil-arch",
+      "category": "landmark",
+      "zone": "sanctuary",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 6000,
+      "textureBudget": "2048x2048",
+      "proxyType": "composed-primitives",
+      "description": "Monumental primeval ribcage archway with mineralized bone textures"
+    },
+    {
+      "id": "sanctuary-pipeline-altar",
+      "category": "interactive",
+      "zone": "sanctuary",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 4000,
+      "textureBudget": "1024x1024",
+      "proxyType": "tiered-cylinder",
+      "description": "Sacred 5-phase production pipeline altar with amber embryo core"
+    },
+    {
+      "id": "sanctuary-bioluminescent-pool",
+      "category": "terrain",
+      "zone": "sanctuary",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 2000,
+      "textureBudget": "none",
+      "proxyType": "pulsing-plane",
+      "description": "Mineral basin with glowing teal water and amber spore crystals"
     }
   ]
 }

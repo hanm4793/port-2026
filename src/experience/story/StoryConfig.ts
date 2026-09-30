@@ -182,25 +182,42 @@ export const STORY_CHAPTERS: StoryChapter[] = [
     title: 'Worlds',
     zones: ['sanctuary'],
     theme: 'dark',
+    preloadZone: 'amphitheatre',
     beats: [
       {
+        // Beat 1: Approaching the Fossil Arch
         at: 0.0,
         camera: {
-          position: [0, 4, -22],
-          target: [0, 3, -32],
+          position: [0, 4.5, -18],
+          target: [0, 2.5, -28],
           fov: 48,
         },
         label: '04',
-        heading: 'I Build Worlds',
-        body: 'AI-generated 3D films, original storytelling, and experimental media. An entire dinosaur universe born from imagination and emerging AI tools.',
+        heading: 'Primeval Horizons',
+        body: 'Beyond systems lies original world-building. Directing fictional ecosystems with strict cinematographic control.',
       },
       {
-        at: 0.6,
+        // Beat 2: Focused on the Pipeline Altar
+        at: 0.4,
         camera: {
-          position: [4, 3.5, -28],
-          target: [-2, 2, -36],
-          fov: 50,
+          position: [3.8, 3.0, -27],
+          target: [3.5, 2.0, -31],
+          fov: 44,
         },
+        heading: 'The Generative Pipeline',
+        body: 'From lore bible to 3D animatics, steered neural synthesis, and live orchestral score. No generic AI slop.',
+        cta: { text: 'View Film Chronicle', href: '/projects/dinosaur-universe-chronicles' },
+      },
+      {
+        // Beat 3: Wide vista across the glowing sanctuary basin
+        at: 0.8,
+        camera: {
+          position: [-3.5, 3.8, -25],
+          target: [1.0, 1.8, -31],
+          fov: 52,
+        },
+        heading: 'Crafted Imagination',
+        body: 'Every creature silhouette, lighting key, and narrative arc is authored with intent.',
       },
     ],
   },

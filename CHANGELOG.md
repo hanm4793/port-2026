@@ -185,16 +185,29 @@ All notable progress on port-2026 / Island of Memory.
 
 ---
 
+## Step 16 — Prototype Dino Sanctuary Zone (2026-09-30)
+
+- Created `sanctuaryConfig.ts` with 6 named cameras, sanctuary palette, and 5-phase generative filmmaking pipeline
+- Implemented `FossilArch.tsx` landmark: monumental ribcage archway with mineralized bone PBR and pulsing amber/teal marrow inlays
+- Implemented `PipelineAltar.tsx`: tiered sandstone altar with 5 surrounding stele pillars representing the 5 pipeline phases (Lore, 3D Pre-Vis, Neural Diffusion, Scoring, 4K Master) with interactive state rotation and docking to `dinosaur-universe-chronicles`
+- Implemented `BioluminescentPool.tsx`: mineral basin with vertex-animated ripple shaders and glowing amber spore clusters
+- Assembled `DinoSanctuaryZone.tsx` featuring valley floor depression, basalt canyon cliffs, primeval canopy monoliths, and misty atmospheric lighting
+- Mounted `DinoSanctuaryZone` into `Experience.tsx` and synchronized Chapter 4 ("Worlds") in `StoryConfig.ts` with 3 cinematic beats
+- Updated `manifest.json` with 3 new sanctuary assets
+- Verified build and dev server on port 3333
+
+---
+
 ## Current State Summary
 
 | Layer | Status |
 |-------|--------|
 | Design docs | 7 documents, all cross-referenced |
-| Codebase | 60+ source files, builds clean, 0 type errors |
-| Zones live | Shore of Arrival + Forum of Systems rendered in scene |
+| Codebase | 65+ source files, builds clean, 0 type errors |
+| Zones live | Shore of Arrival + Forum of Systems + Dino Sanctuary rendered in scene |
 | Story Mode | Active with GSAP + Lenis, 6 chapters, beat-driven camera rail |
 | Explore Mode | Toggleable via Shore orb or UI, activates OrbitControls |
 | Overlays & Panels | Contextual right-side drawer (`CaseStudyPanel`) docked to 3D |
-| Routes | `/` (landing + 3D), `/contact` (form), `/api/contact` (handler) |
-| Remaining zones | Agora, Atelier (proxy exists), Amphitheatre, Sanctuary, Temple, Beacon |
+| Routes | `/`, `/services`, `/services/[slug]`, `/projects`, `/projects/[slug]`, `/about`, `/contact`, `/api/contact` |
+| Remaining zones | Agora, Atelier (proxy exists), Amphitheatre, Temple, Beacon |
 | Mobile experience | Responsive DOM shell ready, dedicated mobile 2D scroll layout pending |
