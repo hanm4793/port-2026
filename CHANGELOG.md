@@ -122,18 +122,59 @@ All notable progress on port-2026 / Island of Memory.
 
 ---
 
+## Step 10 — Story Mode System (2026-09-28)
+
+- Created `StoryConfig.ts` with 6 core narrative chapters
+- Integrated Lenis smooth scroll with GSAP ScrollTrigger in `useStoryScroll.ts`
+- Implemented `StoryCameraRail.tsx` in R3F with smooth damping
+- Created `StoryChapters.tsx` for semantic DOM scroll sections (150vh each)
+- Added `ChapterProgress.tsx` vertical dot indicator
+- Wrapped landing page with `StoryPageWrapper.tsx` and updated `Experience.tsx`
+
+---
+
+## Step 11 — Shore in Story Mode (2026-09-29)
+
+- Upgraded `StoryConfig.ts` to support multi-beat chapters (`beats[]` array)
+- Configured 4 cinematic camera beats for Chapter 1 (Shore of Arrival): Establishing, Descent, Reveal, Threshold
+- Upgraded `StoryCameraRail.tsx` to interpolate smoothly across multi-beat keyframes with smoothstep
+- Synchronized DOM beat cards in `StoryChapters.tsx`
+- Commit & push `10bd252`
+
+---
+
+## Step 12 — Forum of Systems Prototype (2026-09-29)
+
+- Created `forumConfig.ts` with 5 named cameras and cool technical palette
+- Created `ForumZone.tsx` featuring raised stone platform with inlays, colonnades, entrance arch, 5 archive alcoves, floor data current circuits, and technical lighting
+- Implemented `SystemTable.tsx` landmark with floating layered architecture (Frontend, API, Backend) and circuit inlays
+- Added 5 floating system nodes with dynamic circuit connections
+- Updated Story Chapter 2 camera path to navigate through Forum
+- Commit & push `50671b6`
+
+---
+
+## Step 13 — Case-Study Docking for Forum (2026-09-30)
+
+- Built `CaseStudyPanel.tsx` right-side drawer using Framer Motion spring physics
+- Replaced generic modal with contextual drawer preserving 3D view on left
+- Transformed Forum archive alcoves into interactive project hotspots with gold glow status
+- Created `CaseStudyPanelWrapper.tsx` client boundary for server component
+- Wired direct trigger from Forum 3D objects to project details
+- Commit & push `e9fd154`
+
+---
+
 ## Current State Summary
 
 | Layer | Status |
 |-------|--------|
 | Design docs | 7 documents, all cross-referenced |
-| Codebase | 58 source files, builds clean |
-| Shore zone | Proxy prototype, QA'd and refined |
-| Atelier zone | Proxy prototype (not primary view) |
-| Routes | `/`, `/contact`, `/api/contact` |
-| 6 remaining zones | Not started |
-| Scroll camera | Data defined, not wired |
-| Mobile | Not started |
-| Content | Placeholder |
-| Tests | Not started |
-| CI/CD | Not started |
+| Codebase | 60+ source files, builds clean, 0 type errors |
+| Zones live | Shore of Arrival + Forum of Systems rendered in scene |
+| Story Mode | Active with GSAP + Lenis, 6 chapters, beat-driven camera rail |
+| Explore Mode | Toggleable via Shore orb or UI, activates OrbitControls |
+| Overlays & Panels | Contextual right-side drawer (`CaseStudyPanel`) docked to 3D |
+| Routes | `/` (landing + 3D), `/contact` (form), `/api/contact` (handler) |
+| Remaining zones | Agora, Atelier (proxy exists), Amphitheatre, Sanctuary, Temple, Beacon |
+| Mobile experience | Responsive DOM shell ready, dedicated mobile 2D scroll layout pending |
