@@ -10,10 +10,10 @@
 //   - API (middle, blue)
 //   - Backend (bottom, teal)
 //
-// Interaction: clicking reveals the layers separating and pulsing.
-// This is the "I build systems" proof piece.
+// Interaction: clicking anywhere on the table or floating layers opens
+// the technical service scope drawer.
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { FORUM_PALETTE } from './forumConfig';
@@ -21,36 +21,36 @@ import { InteractiveObject } from '@/experience/interaction/InteractiveObject';
 
 export function SystemTable() {
   return (
-    <group position={[0, 0.5, -9]}>
-      {/* Stone table base */}
-      <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
-        <boxGeometry args={[4, 0.15, 2.5]} />
-        <meshStandardMaterial color="#2A2624" roughness={0.5} />
-      </mesh>
-
-      {/* Table legs — 4 sturdy stone pillars */}
-      {[[-1.7, 0, -1], [1.7, 0, -1], [-1.7, 0, 1], [1.7, 0, 1]].map((p, i) => (
-        <mesh key={i} position={p as [number, number, number]} castShadow>
-          <boxGeometry args={[0.25, 0.6, 0.25]} />
-          <meshStandardMaterial color="#3A3430" roughness={0.6} />
+    <InteractiveObject
+      config={{
+        id: 'forum-system-table',
+        zone: 'forum',
+        overlayId: 'service',
+        overlayData: { service: 'web-development', slug: 'web-development' },
+      }}
+    >
+      <group position={[0, 0.5, -9]}>
+        {/* Stone table base */}
+        <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
+          <boxGeometry args={[4, 0.15, 2.5]} />
+          <meshStandardMaterial color="#2A2624" roughness={0.5} />
         </mesh>
-      ))}
 
-      {/* Architecture layers floating above the table */}
-      <InteractiveObject
-        config={{
-          id: 'forum-system-table',
-          zone: 'forum',
-          overlayId: 'service',
-          overlayData: { service: 'web-development' },
-        }}
-      >
+        {/* Table legs — 4 sturdy stone pillars */}
+        {[[-1.7, 0, -1], [1.7, 0, -1], [-1.7, 0, 1], [1.7, 0, 1]].map((p, i) => (
+          <mesh key={i} position={p as [number, number, number]} castShadow>
+            <boxGeometry args={[0.25, 0.6, 0.25]} />
+            <meshStandardMaterial color="#3A3430" roughness={0.6} />
+          </mesh>
+        ))}
+
+        {/* Architecture layers floating above the table */}
         <ArchitectureLayers />
-      </InteractiveObject>
 
-      {/* Table-top circuit inlays */}
-      <CircuitInlays />
-    </group>
+        {/* Table-top circuit inlays */}
+        <CircuitInlays />
+      </group>
+    </InteractiveObject>
   );
 }
 
@@ -58,7 +58,7 @@ export function SystemTable() {
 
 function ArchitectureLayers() {
   const groupRef = useRef<THREE.Group>(null);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded] = useState(false);
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
@@ -67,8 +67,8 @@ function ArchitectureLayers() {
     // Gentle float
     groupRef.current.position.y = 1.2 + Math.sin(t * 0.8) * 0.05;
 
-    // Layers expand when clicked (via overlay)
-    const targetSpacing = expanded ? 0.6 : 0.2;
+    // Layers spacing
+    const targetSpacing = expanded ? 0.6 : 0.24;
     groupRef.current.children.forEach((child, i) => {
       if (child instanceof THREE.Mesh) {
         const targetY = (i - 1) * targetSpacing;
@@ -80,16 +80,16 @@ function ArchitectureLayers() {
   return (
     <group ref={groupRef} position={[0, 1.2, 0]}>
       {/* Frontend layer — gold, top */}
-      <mesh position={[0, 0.2, 0]}>
+      <mesh position={[0, 0.24, 0]}>
         <boxGeometry args={[2.5, 0.06, 1.5]} />
         <meshStandardMaterial
           color={FORUM_PALETTE.nodeActive}
           emissive={FORUM_PALETTE.nodeActive}
-          emissiveIntensity={0.4}
+          emissiveIntensity={0.6}
           roughness={0.15}
           metalness={0.3}
           transparent
-          opacity={0.7}
+          opacity={0.8}
         />
       </mesh>
 
@@ -99,25 +99,25 @@ function ArchitectureLayers() {
         <meshStandardMaterial
           color={FORUM_PALETTE.circuitPrimary}
           emissive={FORUM_PALETTE.circuitPrimary}
-          emissiveIntensity={0.5}
+          emissiveIntensity={0.7}
           roughness={0.1}
           metalness={0.4}
           transparent
-          opacity={0.7}
+          opacity={0.8}
         />
       </mesh>
 
       {/* Backend layer — teal, bottom */}
-      <mesh position={[0, -0.2, 0]}>
+      <mesh position={[0, -0.24, 0]}>
         <boxGeometry args={[2.8, 0.06, 1.8]} />
         <meshStandardMaterial
           color={FORUM_PALETTE.nodeGlow}
           emissive={FORUM_PALETTE.nodeGlow}
-          emissiveIntensity={0.35}
+          emissiveIntensity={0.5}
           roughness={0.15}
           metalness={0.3}
           transparent
-          opacity={0.6}
+          opacity={0.75}
         />
       </mesh>
     </group>
@@ -158,7 +158,7 @@ function CircuitInlays() {
           <meshStandardMaterial
             color={FORUM_PALETTE.circuitPrimary}
             emissive={FORUM_PALETTE.circuitPrimary}
-            emissiveIntensity={0.5}
+            emissiveIntensity={0.6}
             roughness={0.05}
             metalness={0.4}
           />

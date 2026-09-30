@@ -1,8 +1,8 @@
 'use client';
 
 // =============================================================================
-// CaseStudyPanel — contextual slide-in drawer for project details
-// Renders rich case-study data with challenge, decisions, results, and CTA.
+// CaseStudyPanel — contextual slide-in drawer for project & service details
+// Renders rich case-study data or service scope directly over the 3D scene.
 // =============================================================================
 
 import { useCallback, useEffect } from 'react';
@@ -11,7 +11,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useOverlayStore } from '@/stores/useOverlayStore';
 import { useExperienceStore } from '@/stores/useExperienceStore';
 import { projects } from '@/data/projects';
-import type { Project } from '@/types/content';
+import { services } from '@/data/services';
+import type { Project, Service } from '@/types/content';
 
 export function CaseStudyPanel() {
   const activeOverlay = useOverlayStore((s) => s.activeOverlay);
@@ -19,11 +20,15 @@ export function CaseStudyPanel() {
   const closeOverlay = useOverlayStore((s) => s.closeOverlay);
   const closeDetail = useExperienceStore((s) => s.closeDetail);
 
-  const isOpen = activeOverlay === 'project';
-  const projectSlug = overlayData?.slug as string | undefined;
-  const project = projectSlug
-    ? projects.find((p) => p.slug === projectSlug)
-    : null;
+  const isOpen = activeOverlay === 'project' || activeOverlay === 'service';
+
+  // Resolve project
+  const projectSlug = (overlayData?.slug || overlayData?.project) as string | undefined;
+  const project = projectSlug ? projects.find((p) => p.slug === projectSlug) : null;
+
+  // Resolve service
+  const serviceSlug = (overlayData?.service || overlayData?.slug) as string | undefined;
+  const service = serviceSlug ? services.find((s) => s.slug === serviceSlug) : null;
 
   const handleClose = useCallback(() => {
     closeOverlay();
@@ -69,17 +74,25 @@ export function CaseStudyPanel() {
               className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center
                          border border-[#3A3632]/50 bg-[#1E1B18] text-[#A89E8E] hover:text-[#F5F0E6]
                          hover:border-[#C9A84C]/60 transition-colors text-lg"
-              aria-label="Close Case Study"
+              aria-label="Close Drawer"
             >
               &times;
             </button>
 
-            {/* Content */}
-            {project ? (
+            {/* Dynamic Content */}
+            {activeOverlay === 'project' && project && (
               <CaseStudyDetail project={project} />
-            ) : (
+            )}
+
+            {activeOverlay === 'service' && service && (
+              <ServiceDetail service={service} />
+            )}
+
+            {/* Fallback if slug not resolved */}
+            {((activeOverlay === 'project' && !project) ||
+              (activeOverlay === 'service' && !service)) && (
               <div className="p-8 pt-20 text-center text-[#A89E8E]">
-                <p>Project documentation not found.</p>
+                <p>Content specification not found.</p>
               </div>
             )}
           </motion.aside>
@@ -88,6 +101,8 @@ export function CaseStudyPanel() {
     </AnimatePresence>
   );
 }
+
+// ─── Case Study Detail View ─────────────────────────────────────────────────
 
 function CaseStudyDetail({ project }: { project: Project }) {
   const cs = project.caseStudy;
@@ -144,7 +159,7 @@ function CaseStudyDetail({ project }: { project: Project }) {
         </div>
       </div>
 
-      {/* Results Banner (if available) */}
+      {/* Results Banner */}
       {cs?.results && cs.results.length > 0 && (
         <div className="grid grid-cols-2 gap-3 p-4 bg-[#141210] border border-[#3A3632]/50">
           {cs.results.slice(0, 2).map((res, i) => (
@@ -221,6 +236,100 @@ function CaseStudyDetail({ project }: { project: Project }) {
           className="block w-full py-2.5 text-center text-xs tracking-wider uppercase border border-[#3A3632] text-[#A89E8E] hover:text-[#F5F0E6] hover:border-[#8A7E6E] transition-colors"
         >
           Full Case Study Page &rarr;
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// ─── Service Scope Detail View ──────────────────────────────────────────────
+
+function ServiceDetail({ service }: { service: Service }) {
+  return (
+    <div className="p-6 md:p-8 pt-16 pb-24 space-y-8">
+      {/* Header */}
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-[10px] tracking-[0.2em] uppercase text-[#C9A84C]">
+            Cluster / {service.group.toUpperCase()}
+          </span>
+          <span className="text-[#3A3632]">/</span>
+          <span className="text-[10px] tracking-wider uppercase text-[#8A7E6E]">
+            {service.shortTitle}
+          </span>
+        </div>
+
+        <h2 className="text-2xl md:text-3xl font-light tracking-tight text-[#F5F0E6] mb-3">
+          {service.title}
+        </h2>
+
+        <p className="text-sm text-[#C4A777] leading-relaxed mb-4">
+          {service.tagline}
+        </p>
+
+        <p className="text-xs text-[#B8AEA0] leading-relaxed">
+          {service.description}
+        </p>
+      </div>
+
+      {/* Benchmark Metric */}
+      {service.metricHighlight && (
+        <div className="p-3 bg-[#141210] border border-[#3A3632]/50">
+          <span className="text-[10px] uppercase tracking-wider text-[#8A7E6E] block mb-0.5">
+            Performance Standard
+          </span>
+          <span className="text-xs font-light text-[#C9A84C]">
+            {service.metricHighlight}
+          </span>
+        </div>
+      )}
+
+      {/* Target Deliverables */}
+      <div>
+        <h3 className="text-[11px] tracking-wider uppercase text-[#F5F0E6] mb-3">
+          Target Deliverables
+        </h3>
+        <ul className="space-y-2">
+          {service.deliverables.map((item, idx) => (
+            <li key={idx} className="flex items-start gap-2.5 text-xs text-[#B8AEA0]">
+              <span className="text-[#C9A84C] mt-0.5">▪</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Tooling */}
+      <div>
+        <h3 className="text-[11px] tracking-wider uppercase text-[#F5F0E6] mb-2.5">
+          Production Tooling
+        </h3>
+        <div className="flex flex-wrap gap-1.5">
+          {service.tools.map((tool) => (
+            <span
+              key={tool}
+              className="px-2 py-0.5 text-[10px] tracking-wider uppercase border border-[#3A3632]/70 text-[#A89E8E] bg-[#141210]"
+            >
+              {tool}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Action Footer */}
+      <div className="pt-6 border-t border-[#3A3632]/40 space-y-3">
+        <Link
+          href={`/contact?service=${service.slug}`}
+          className="block w-full py-3 text-center text-xs tracking-wider uppercase bg-[#C9A84C] text-[#1A1816] font-medium hover:bg-[#C9A84C]/80 transition-colors"
+        >
+          Scope {service.shortTitle} Project
+        </Link>
+
+        <Link
+          href={`/services/${service.slug}`}
+          className="block w-full py-2.5 text-center text-xs tracking-wider uppercase border border-[#3A3632] text-[#A89E8E] hover:text-[#F5F0E6] hover:border-[#8A7E6E] transition-colors"
+        >
+          Full Service Page &rarr;
         </Link>
       </div>
     </div>

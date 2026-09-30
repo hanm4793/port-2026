@@ -14,7 +14,6 @@ import { InteractiveObject } from '@/experience/interaction/InteractiveObject';
 
 export function PipelineAltar() {
   const [activeStep, setActiveStep] = useState(0);
-  const altarRef = useRef<THREE.Group>(null);
   const orbRef = useRef<THREE.Mesh>(null);
 
   // Floating heartbeat rotation on central amber relic
@@ -32,9 +31,9 @@ export function PipelineAltar() {
   }, []);
 
   return (
-    <group ref={altarRef} position={[3.5, 0, -30]} onClick={handleNextStep}>
+    <group position={[3.5, 0, -30]}>
       {/* Tiered Sandstone Altar Dais */}
-      <mesh position={[0, 0.25, 0]} receiveShadow>
+      <mesh position={[0, 0.25, 0]} receiveShadow onClick={handleNextStep}>
         <cylinderGeometry args={[2.8, 3.2, 0.5, 8]} />
         <meshStandardMaterial
           color={SANCTUARY_PALETTE.sacredSandstone}
@@ -42,7 +41,7 @@ export function PipelineAltar() {
           metalness={0.05}
         />
       </mesh>
-      <mesh position={[0, 0.65, 0]} receiveShadow>
+      <mesh position={[0, 0.65, 0]} receiveShadow onClick={handleNextStep}>
         <cylinderGeometry args={[2.0, 2.4, 0.4, 8]} />
         <meshStandardMaterial
           color={SANCTUARY_PALETTE.sacredSandstone}
@@ -70,16 +69,24 @@ export function PipelineAltar() {
           overlayData: { slug: 'dinosaur-universe-chronicles' },
         }}
       >
-        <mesh ref={orbRef} position={[0, 2.4, 0]} castShadow>
-          <icosahedronGeometry args={[0.42, 0]} />
+        <mesh
+          ref={orbRef}
+          position={[0, 2.4, 0]}
+          castShadow
+          onClick={(e) => {
+            e.stopPropagation();
+            handleNextStep();
+          }}
+        >
+          <icosahedronGeometry args={[0.45, 0]} />
           <meshStandardMaterial
             color={CINEMATIC_PIPELINE[activeStep].color}
             emissive={CINEMATIC_PIPELINE[activeStep].color}
-            emissiveIntensity={1.2}
+            emissiveIntensity={1.3}
             roughness={0.15}
             metalness={0.4}
             transparent
-            opacity={0.9}
+            opacity={0.92}
           />
         </mesh>
       </InteractiveObject>
@@ -93,7 +100,15 @@ export function PipelineAltar() {
         const isCurrent = idx === activeStep;
 
         return (
-          <group key={phase.step} position={[x, 0.8, z]} rotation={[0, -angle + Math.PI / 2, 0]}>
+          <group
+            key={phase.step}
+            position={[x, 0.8, z]}
+            rotation={[0, -angle + Math.PI / 2, 0]}
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveStep(idx);
+            }}
+          >
             {/* Stele Body */}
             <mesh position={[0, 0.6, 0]} castShadow receiveShadow>
               <boxGeometry args={[0.3, isCurrent ? 1.5 : 1.1, 0.15]} />
