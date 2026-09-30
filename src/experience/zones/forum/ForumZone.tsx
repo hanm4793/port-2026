@@ -293,48 +293,69 @@ function NodeConnections({ nodes }: { nodes: readonly (readonly [number, number,
 }
 
 // ─── Archive alcoves ────────────────────────────────────────────────────
-// Recessed niches in the back wall — one per service category
+// Project hotspots — each alcove opens a case study panel
 
 function ArchiveAlcoves() {
   const alcoves = [
-    { x: -5, label: 'Web' },
-    { x: -2.5, label: 'Apps' },
-    { x: 0, label: 'CRM' },
-    { x: 2.5, label: 'Auto' },
-    { x: 5, label: 'API' },
+    { x: -5, label: 'Web', projectSlug: 'placeholder-web-app' },
+    { x: -2.5, label: 'Apps', projectSlug: null },
+    { x: 0, label: 'CRM', projectSlug: 'placeholder-crm' },
+    { x: 2.5, label: 'Auto', projectSlug: null },
+    { x: 5, label: 'API', projectSlug: null },
   ];
 
   return (
     <group>
-      {alcoves.map((alcove, i) => (
-        <group key={i} position={[alcove.x, 0.5, -13.5]}>
-          {/* Alcove recess */}
-          <mesh position={[0, 1.5, 0]} receiveShadow>
-            <boxGeometry args={[1.8, 2.5, 0.6]} />
-            <meshStandardMaterial color={FORUM_PALETTE.archiveDark} roughness={0.8} />
-          </mesh>
-          {/* Alcove frame */}
-          <mesh position={[0, 1.5, 0.32]} castShadow>
-            <boxGeometry args={[2, 2.8, 0.05]} />
-            <meshStandardMaterial color={FORUM_PALETTE.wallStone} roughness={0.5} />
-          </mesh>
-          {/* Inner opening */}
-          <mesh position={[0, 1.5, 0.35]}>
-            <boxGeometry args={[1.5, 2.2, 0.02]} />
-            <meshStandardMaterial color={FORUM_PALETTE.archiveDark} roughness={0.9} />
-          </mesh>
-          {/* Glow accent at top of alcove */}
-          <mesh position={[0, 2.85, 0.33]}>
-            <boxGeometry args={[1.6, 0.04, 0.04]} />
-            <meshStandardMaterial
-              color={FORUM_PALETTE.circuitPrimary}
-              emissive={FORUM_PALETTE.circuitPrimary}
-              emissiveIntensity={0.5}
-              roughness={0.05}
-            />
-          </mesh>
-        </group>
-      ))}
+      {alcoves.map((alcove, i) => {
+        const alcoveGroup = (
+          <group key={i} position={[alcove.x, 0.5, -13.5]}>
+            {/* Alcove recess */}
+            <mesh position={[0, 1.5, 0]} receiveShadow>
+              <boxGeometry args={[1.8, 2.5, 0.6]} />
+              <meshStandardMaterial color={FORUM_PALETTE.archiveDark} roughness={0.8} />
+            </mesh>
+            {/* Alcove frame */}
+            <mesh position={[0, 1.5, 0.32]} castShadow>
+              <boxGeometry args={[2, 2.8, 0.05]} />
+              <meshStandardMaterial color={FORUM_PALETTE.wallStone} roughness={0.5} />
+            </mesh>
+            {/* Inner opening */}
+            <mesh position={[0, 1.5, 0.35]}>
+              <boxGeometry args={[1.5, 2.2, 0.02]} />
+              <meshStandardMaterial color={FORUM_PALETTE.archiveDark} roughness={0.9} />
+            </mesh>
+            {/* Glow accent — brighter if has project */}
+            <mesh position={[0, 2.85, 0.33]}>
+              <boxGeometry args={[1.6, 0.04, 0.04]} />
+              <meshStandardMaterial
+                color={alcove.projectSlug ? FORUM_PALETTE.nodeActive : FORUM_PALETTE.circuitPrimary}
+                emissive={alcove.projectSlug ? FORUM_PALETTE.nodeActive : FORUM_PALETTE.circuitPrimary}
+                emissiveIntensity={alcove.projectSlug ? 0.8 : 0.3}
+                roughness={0.05}
+              />
+            </mesh>
+          </group>
+        );
+
+        // Wrap with InteractiveObject if this alcove has a project
+        if (alcove.projectSlug) {
+          return (
+            <InteractiveObject
+              key={i}
+              config={{
+                id: `forum-alcove-${alcove.label.toLowerCase()}`,
+                zone: 'forum',
+                overlayId: 'project',
+                overlayData: { slug: alcove.projectSlug },
+              }}
+            >
+              {alcoveGroup}
+            </InteractiveObject>
+          );
+        }
+
+        return alcoveGroup;
+      })}
     </group>
   );
 }
