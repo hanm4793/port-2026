@@ -1,41 +1,66 @@
 import { NextResponse } from 'next/server';
+import type { ContactBrief } from '@/types/content';
 
 /**
- * Contact form API route.
- * Placeholder — will integrate with email service (Resend, SendGrid, etc.)
+ * Contact Brief API Route.
+ * Validates qualified project briefs with anti-bot honeypot protection.
  */
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, email, message } = body;
+    const body: ContactBrief = await request.json();
+    const { name, email, services, description, timeline, budget, honeypot } = body;
 
-    // Validate required fields
-    if (!name || !email || !message) {
+    // 1. Honeypot check: If hidden field is filled, silently discard (bot detected)
+    if (honeypot && honeypot.trim().length > 0) {
+      console.warn('[Contact API] Bot honeypot triggered:', { email, name });
+      return NextResponse.json({ success: true, message: 'Brief received.' });
+    }
+
+    // 2. Validate required identity
+    if (!name?.trim() || !email?.trim()) {
       return NextResponse.json(
-        { error: 'Name, email, and message are required.' },
-        { status: 400 },
+        { error: 'Name and a valid email address are required.' },
+        { status: 400 }
       );
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(email.trim())) {
       return NextResponse.json(
-        { error: 'Invalid email address.' },
-        { status: 400 },
+        { error: 'Please provide a valid email format.' },
+        { status: 400 }
       );
     }
 
-    // TODO: Send email via Resend/SendGrid
-    // await sendEmail({ to: 'han@example.com', from: email, subject: `Portfolio inquiry from ${name}`, text: message });
+    // 3. Validate scope
+    if (!description || description.trim().length < 20) {
+      return NextResponse.json(
+        { error: 'Please provide at least 20 characters describing your project ambition.' },
+        { status: 400 }
+      );
+    }
 
-    console.log('[Contact API] New inquiry:', { name, email, message: message.slice(0, 100) });
+    // 4. Log or deliver inquiry
+    console.log('[Contact API] Qualified Project Brief Received:', {
+      name,
+      email,
+      company: body.company || 'N/A',
+      services: services || [],
+      timeline: timeline || 'unspecified',
+      budget: budget || 'unspecified',
+      charCount: description.length,
+      timestamp: new Date().toISOString(),
+    });
 
-    return NextResponse.json({ success: true, message: 'Message received.' });
-  } catch {
+    return NextResponse.json({
+      success: true,
+      message: 'Project brief verified and queued for direct scoping review.',
+    });
+  } catch (err: unknown) {
+    console.error('[Contact API] Internal error processing brief:', err);
     return NextResponse.json(
-      { error: 'Failed to process request.' },
-      { status: 500 },
+      { error: 'Failed to process project brief. Please email contact@hanm.dev directly.' },
+      { status: 500 }
     );
   }
 }

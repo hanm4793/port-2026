@@ -1,20 +1,12 @@
 'use client';
 
 // =============================================================================
-// CaseStudyPanel — slide-in panel for project details
+// CaseStudyPanel — contextual slide-in drawer for project details
+// Renders rich case-study data with challenge, decisions, results, and CTA.
 // =============================================================================
-//
-// Design decisions:
-// 1. Slides in from the RIGHT side (not centered modal)
-//    → keeps 3D scene partially visible on the left
-//    → user maintains spatial context
-// 2. Max-width 480px on desktop, full-width on mobile
-// 3. Contains: title, category, challenge, approach, solution, results, CTA
-// 4. Close: ESC, click backdrop, close button
-// 5. On open: experience enters "detail" mode (camera pulls back)
-// 6. On close: returns to previous mode
 
 import { useCallback, useEffect } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOverlayStore } from '@/stores/useOverlayStore';
 import { useExperienceStore } from '@/stores/useExperienceStore';
@@ -38,7 +30,6 @@ export function CaseStudyPanel() {
     closeDetail();
   }, [closeOverlay, closeDetail]);
 
-  // ESC to close
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -52,42 +43,43 @@ export function CaseStudyPanel() {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop — click to close */}
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-40 bg-[#1A1816]/50 backdrop-blur-[2px]"
+            className="fixed inset-0 z-40 bg-[#1A1816]/60 backdrop-blur-[3px]"
             onClick={handleClose}
           />
 
-          {/* Slide-in panel from right */}
+          {/* Slide-in panel */}
           <motion.aside
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md
-                       bg-[#1A1816] border-l border-[#3A3632]/40
-                       overflow-y-auto"
+            transition={{ type: 'spring', damping: 26, stiffness: 220 }}
+            className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-lg
+                       bg-[#181614] border-l border-[#3A3632]/50
+                       overflow-y-auto shadow-2xl"
           >
             {/* Close button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center
-                         text-[#A89E8E] hover:text-[#F5F0E6] transition-colors text-lg"
-              aria-label="Close"
+              className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center
+                         border border-[#3A3632]/50 bg-[#1E1B18] text-[#A89E8E] hover:text-[#F5F0E6]
+                         hover:border-[#C9A84C]/60 transition-colors text-lg"
+              aria-label="Close Case Study"
             >
               &times;
             </button>
 
             {/* Content */}
             {project ? (
-              <CaseStudyContent project={project} onClose={handleClose} />
+              <CaseStudyDetail project={project} />
             ) : (
-              <div className="p-8 pt-16 text-center text-[#A89E8E]">
-                <p>Project not found.</p>
+              <div className="p-8 pt-20 text-center text-[#A89E8E]">
+                <p>Project documentation not found.</p>
               </div>
             )}
           </motion.aside>
@@ -97,43 +89,54 @@ export function CaseStudyPanel() {
   );
 }
 
-// ─── Case study content ─────────────────────────────────────────────────
+function CaseStudyDetail({ project }: { project: Project }) {
+  const cs = project.caseStudy;
 
-function CaseStudyContent({
-  project,
-  onClose,
-}: {
-  project: Project;
-  onClose: () => void;
-}) {
   return (
-    <div className="p-6 pt-14 pb-20">
-      {/* Category badge */}
-      <span className="inline-block text-[10px] tracking-[0.2em] uppercase text-[#C9A84C] mb-3">
-        {project.category}
-      </span>
+    <div className="p-6 md:p-8 pt-16 pb-24 space-y-8">
+      {/* Header */}
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-[10px] tracking-[0.2em] uppercase text-[#C9A84C]">
+            {project.category}
+          </span>
+          <span className="text-[#3A3632]">/</span>
+          <span className="text-[10px] tracking-wider uppercase text-[#8A7E6E]">
+            {project.year}
+          </span>
+          {project.client && (
+            <>
+              <span className="text-[#3A3632]">/</span>
+              <span className="text-[10px] tracking-wider uppercase text-[#8A7E6E] truncate max-w-[180px]">
+                {project.client}
+              </span>
+            </>
+          )}
+        </div>
 
-      {/* Title */}
-      <h2 className="text-2xl font-light tracking-tight mb-2 text-[#F5F0E6]">
-        {project.title}
-      </h2>
+        <h2 className="text-2xl md:text-3xl font-light tracking-tight text-[#F5F0E6] mb-3">
+          {project.title}
+        </h2>
 
-      {/* Description */}
-      <p className="text-sm text-[#B8AEA0] leading-relaxed mb-6">
-        {project.description}
-      </p>
+        <p className="text-sm text-[#C4A777] leading-relaxed mb-4">
+          {project.tagline}
+        </p>
 
-      {/* Tech stack */}
-      <div className="mb-6">
-        <h3 className="text-xs tracking-wider uppercase text-[#A89E8E] mb-2">
-          Technology
+        <p className="text-xs text-[#B8AEA0] leading-relaxed">
+          {project.summary}
+        </p>
+      </div>
+
+      {/* Tech Stack */}
+      <div>
+        <h3 className="text-[11px] tracking-wider uppercase text-[#F5F0E6] mb-2.5">
+          Engineered With
         </h3>
         <div className="flex flex-wrap gap-1.5">
           {project.techStack.map((tech) => (
             <span
               key={tech}
-              className="px-2 py-0.5 text-[10px] tracking-wider uppercase
-                         border border-[#3A3632]/60 text-[#A89E8E]"
+              className="px-2 py-0.5 text-[10px] tracking-wider uppercase border border-[#3A3632]/70 text-[#A89E8E] bg-[#141210]"
             >
               {tech}
             </span>
@@ -141,64 +144,85 @@ function CaseStudyContent({
         </div>
       </div>
 
-      {/* Case study sections (placeholder — real content from owner) */}
-      <CaseStudySection
-        title="The Challenge"
-        body="Understanding the client's needs and defining the core problem to solve."
-      />
-      <CaseStudySection
-        title="The Approach"
-        body="Analyzing requirements, choosing the right architecture, and planning the build."
-      />
-      <CaseStudySection
-        title="The Solution"
-        body="Building the system with clean architecture, tested components, and production-ready deployment."
-      />
-      <CaseStudySection
-        title="The Results"
-        body="Measurable outcomes and client satisfaction. Specific metrics will be added with real project data."
-      />
-
-      {/* Divider */}
-      <div className="h-px bg-[#3A3632]/40 my-6" />
-
-      {/* CTA */}
-      <div className="text-center">
-        <p className="text-xs text-[#A89E8E] mb-3">Have a similar challenge?</p>
-        <a
-          href={`/contact?project=${project.slug}`}
-          className="inline-block px-5 py-2 text-xs tracking-wider uppercase
-                     bg-[#C9A84C] text-[#1A1816] hover:bg-[#C9A84C]/80
-                     transition-colors"
-        >
-          Discuss This Type of Project
-        </a>
-      </div>
-
-      {/* Full case study link */}
-      {project.url && (
-        <div className="mt-4 text-center">
-          <a
-            href={project.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-[#A89E8E] hover:text-[#C9A84C] transition-colors underline"
-          >
-            View live project &rarr;
-          </a>
+      {/* Results Banner (if available) */}
+      {cs?.results && cs.results.length > 0 && (
+        <div className="grid grid-cols-2 gap-3 p-4 bg-[#141210] border border-[#3A3632]/50">
+          {cs.results.slice(0, 2).map((res, i) => (
+            <div key={i}>
+              <span className="text-[10px] uppercase tracking-wider text-[#8A7E6E] block mb-0.5">
+                {res.metric}
+              </span>
+              <span className="text-lg font-light text-[#C9A84C] block">{res.value}</span>
+              {res.context && (
+                <span className="text-[10px] text-[#A89E8E] block">{res.context}</span>
+              )}
+            </div>
+          ))}
         </div>
       )}
-    </div>
-  );
-}
 
-function CaseStudySection({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="mb-5">
-      <h3 className="text-xs tracking-wider uppercase text-[#C9A84C] mb-1.5">
-        {title}
-      </h3>
-      <p className="text-sm text-[#B8AEA0] leading-relaxed">{body}</p>
+      {/* Case Study Sections */}
+      {cs && (
+        <div className="space-y-6 pt-2 border-t border-[#3A3632]/30">
+          <div>
+            <h4 className="text-xs tracking-wider uppercase text-[#C9A84C] mb-2">
+              The Challenge
+            </h4>
+            <p className="text-xs leading-relaxed text-[#B8AEA0]">{cs.challenge}</p>
+          </div>
+
+          <div>
+            <h4 className="text-xs tracking-wider uppercase text-[#C9A84C] mb-2">
+              The Architectural Approach
+            </h4>
+            <p className="text-xs leading-relaxed text-[#B8AEA0] mb-3">{cs.approach}</p>
+
+            {cs.decisions && cs.decisions.length > 0 && (
+              <div className="space-y-2 pl-3 border-l border-[#C9A84C]/30">
+                {cs.decisions.map((dec, idx) => (
+                  <div key={idx} className="text-xs">
+                    <span className="text-[#F5F0E6] font-medium block">{dec.title}</span>
+                    <span className="text-[#8A7E6E]">{dec.reasoning}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <h4 className="text-xs tracking-wider uppercase text-[#C9A84C] mb-2">
+              The Delivered Solution
+            </h4>
+            <p className="text-xs leading-relaxed text-[#B8AEA0]">{cs.solution}</p>
+          </div>
+
+          {cs.testimonial && (
+            <blockquote className="p-4 bg-[#1E1B18] border-l-2 border-[#C9A84C] text-xs text-[#B8AEA0] italic leading-relaxed">
+              &ldquo;{cs.testimonial.quote}&rdquo;
+              <cite className="block not-italic text-[10px] text-[#8A7E6E] mt-2">
+                — {cs.testimonial.author}, {cs.testimonial.role} ({cs.testimonial.company})
+              </cite>
+            </blockquote>
+          )}
+        </div>
+      )}
+
+      {/* Action Footer */}
+      <div className="pt-6 border-t border-[#3A3632]/40 space-y-3">
+        <Link
+          href={`/contact?project=${project.slug}`}
+          className="block w-full py-3 text-center text-xs tracking-wider uppercase bg-[#C9A84C] text-[#1A1816] font-medium hover:bg-[#C9A84C]/80 transition-colors"
+        >
+          Discuss Similar System
+        </Link>
+
+        <Link
+          href={`/projects/${project.slug}`}
+          className="block w-full py-2.5 text-center text-xs tracking-wider uppercase border border-[#3A3632] text-[#A89E8E] hover:text-[#F5F0E6] hover:border-[#8A7E6E] transition-colors"
+        >
+          Full Case Study Page &rarr;
+        </Link>
+      </div>
     </div>
   );
 }

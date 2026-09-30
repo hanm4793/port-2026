@@ -1,73 +1,55 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
+import { BriefBuilder } from '@/components/forms/BriefBuilder';
+import { SITE_COPY } from '@/data/copy';
 
 export const metadata: Metadata = {
-  title: 'Contact | Han — Builder of Worlds',
-  description: 'Get in touch for web development, AI filmmaking, creative technology projects.',
+  title: 'Project Inquiries & Brief Builder | Han — Builder of Worlds',
+  description:
+    'Commission full-stack systems engineering, custom CRM development, or creative AI direction.',
 };
 
-/**
- * Contact page — SSG, accessible without 3D.
- */
 export default function ContactPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 py-20">
-      <h1 className="text-3xl font-light tracking-tight mb-8">Get in Touch</h1>
+    <div className="space-y-12 max-w-4xl mx-auto">
+      {/* Header */}
+      <header className="text-center max-w-2xl mx-auto space-y-3">
+        <span className="text-xs uppercase tracking-[0.25em] text-[#C9A84C] block">
+          {SITE_COPY.contact.eyebrow}
+        </span>
+        <h1 className="text-3xl md:text-5xl font-light tracking-tight text-[#F5F0E6]">
+          {SITE_COPY.contact.title}
+        </h1>
+        <p className="text-sm md:text-base text-[#B8AEA0] leading-relaxed">
+          {SITE_COPY.contact.subhead}
+        </p>
+      </header>
 
-      <form className="w-full max-w-md space-y-6" action="/api/contact" method="POST">
-        <div>
-          <label htmlFor="name" className="block text-sm text-[#A89E8E] mb-1">
-            Name
-          </label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            required
-            className="w-full bg-transparent border border-[#3A3632] px-4 py-2
-                       text-[#F5F0E6] focus:border-[#C9A84C] focus:outline-none
-                       transition-colors"
-          />
-        </div>
+      {/* Brief Builder Form with Suspense for useSearchParams */}
+      <Suspense
+        fallback={
+          <div className="p-12 text-center text-xs text-[#8A7E6E] bg-[#1E1B18] border border-[#3A3632]/40">
+            Initializing project scoping engine...
+          </div>
+        }
+      >
+        <BriefBuilder />
+      </Suspense>
 
-        <div>
-          <label htmlFor="email" className="block text-sm text-[#A89E8E] mb-1">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            className="w-full bg-transparent border border-[#3A3632] px-4 py-2
-                       text-[#F5F0E6] focus:border-[#C9A84C] focus:outline-none
-                       transition-colors"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="message" className="block text-sm text-[#A89E8E] mb-1">
-            Message
-          </label>
-          <textarea
-            id="message"
-            name="message"
-            required
-            rows={5}
-            className="w-full bg-transparent border border-[#3A3632] px-4 py-2
-                       text-[#F5F0E6] focus:border-[#C9A84C] focus:outline-none
-                       transition-colors resize-none"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="w-full px-6 py-3 text-sm tracking-wider uppercase
-                     bg-[#C9A84C] text-[#1A1816] hover:bg-[#C9A84C]/80
-                     transition-colors"
-        >
-          Send Message
-        </button>
-      </form>
-    </main>
+      {/* Fallback Direct Contact Channel */}
+      <div className="pt-6 border-t border-[#3A3632]/40 text-center space-y-2 text-xs text-[#8A7E6E]">
+        <p>
+          {SITE_COPY.contact.directEmailLabel}{' '}
+          <a
+            href={`mailto:${SITE_COPY.contact.email}`}
+            className="text-[#C9A84C] hover:underline font-mono"
+          >
+            {SITE_COPY.contact.email}
+          </a>
+        </p>
+        <p>{SITE_COPY.contact.responseTime}</p>
+        <p className="text-[11px] text-[#5A5248]">{SITE_COPY.contact.location}</p>
+      </div>
+    </div>
   );
 }

@@ -165,6 +165,26 @@ All notable progress on port-2026 / Island of Memory.
 
 ---
 
+## Steps 14 & 15 — Content & Conversion Layer + Foundation Copy (2026-09-30)
+
+- Created `SITE_COPY` foundation copywriting in `src/data/copy.ts` covering identity, services, systems, AI world-building, music, travel, and brief-builder
+- Expanded `src/types/content.ts` with comprehensive `CaseStudy`, `Decision`, `Result`, `Testimonial`, and `ContactBrief` types
+- Enriched `src/data/services.ts` with all 8 services mapped to deliverables, 4-phase processes, tools, and proof projects
+- Enriched `src/data/projects.ts` with in-depth case studies (Challenge, Approach, Technical Decisions, Delivered Solution, Metrics, and Testimonials)
+- Built reusable components: `ServiceCard.tsx`, `ProjectCard.tsx`, and interactive 3-step `BriefBuilder.tsx` with honeypot spam protection
+- Created marketing layout (`src/app/(marketing)/layout.tsx`) and semantic SSG pages:
+  - `/services` (grouped by Build / Grow / Create clusters)
+  - `/services/[slug]` (all 8 services with static params)
+  - `/projects` (portfolio archive with proof metrics)
+  - `/projects/[slug]` (structured case-study templates with static params)
+  - `/about` (philosophy, 4 pillars, and background narrative)
+  - `/contact` (interactive BriefBuilder form)
+- Updated `/api/contact` API route to validate `ContactBrief` payloads and enforce honeypot filtering
+- Integrated accessible navigation bar in landing page and linked contextual CTAs in Story Mode chapters
+- Generated 25 static pages with zero TypeScript errors
+
+---
+
 ## Current State Summary
 
 | Layer | Status |

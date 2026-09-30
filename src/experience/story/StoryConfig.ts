@@ -130,6 +130,7 @@ export const STORY_CHAPTERS: StoryChapter[] = [
         },
         heading: 'Architecture That Scales',
         body: 'Every system starts with clear architecture. Frontend, API, backend — layered for maintainability.',
+        cta: { text: 'Explore System Services', href: '/services#build' },
       },
       {
         // Looking along the colonnade toward archive alcoves
@@ -139,6 +140,9 @@ export const STORY_CHAPTERS: StoryChapter[] = [
           target: [2, 2, -12],
           fov: 52,
         },
+        heading: 'Verifiable Case Studies',
+        body: 'Click any illuminated alcove to review architectural decisions and production metrics.',
+        cta: { text: 'View Case Studies', href: '/projects' },
       },
     ],
   },
