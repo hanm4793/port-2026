@@ -14,6 +14,7 @@ import { Sky } from './environment/Sky';
 import { Lighting } from './environment/Lighting';
 import { Fog } from './environment/Fog';
 import { ShoreZone } from './zones/shore/ShoreZone';
+import { ForumZone } from './zones/forum/ForumZone';
 import { StoryCameraRail } from './story/StoryCameraRail';
 import { CAMERA_NEAR, CAMERA_FAR } from '@/lib/constants';
 import { SHORE_CAMERAS } from './zones/shore/shoreConfig';
@@ -68,6 +69,7 @@ export function Experience() {
         <Fog />
 
         <ShoreZone />
+        <ForumZone />
 
         {/* Story Mode: scroll-driven camera rail */}
         {mode === 'story' && <StoryCameraRail />}

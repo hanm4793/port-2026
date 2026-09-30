@@ -109,10 +109,11 @@ export const STORY_CHAPTERS: StoryChapter[] = [
     preloadZone: 'agora',
     beats: [
       {
+        // Entering Forum from Shore path
         at: 0.0,
         camera: {
-          position: [0, 3.5, -4],
-          target: [0, 2, -12],
+          position: [0, 3.5, -3],
+          target: [0, 2, -9],
           fov: 50,
         },
         label: '02',
@@ -120,10 +121,22 @@ export const STORY_CHAPTERS: StoryChapter[] = [
         body: 'Web applications, mobile apps, CRM platforms, and enterprise systems. TypeScript-first architecture built for performance and scale.',
       },
       {
-        at: 0.6,
+        // Overhead view of the System Table
+        at: 0.35,
         camera: {
-          position: [-4, 3, -10],
-          target: [2, 2, -18],
+          position: [3, 4, -7],
+          target: [0, 1.8, -9],
+          fov: 48,
+        },
+        heading: 'Architecture That Scales',
+        body: 'Every system starts with clear architecture. Frontend, API, backend — layered for maintainability.',
+      },
+      {
+        // Looking along the colonnade toward archive alcoves
+        at: 0.7,
+        camera: {
+          position: [-4, 3, -6],
+          target: [2, 2, -12],
           fov: 52,
         },
       },
