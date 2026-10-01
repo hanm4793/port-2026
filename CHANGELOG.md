@@ -296,11 +296,22 @@ All notable progress on port-2026 / Island of Memory.
 
 ---
 
+## Step 23 — Comprehensive Visual & Experience QA Audit (2026-10-01)
+
+- Created `VISUAL-QA-AUDIT.md`: thorough site-wide review across all 11 core dimensions evaluating first impression, zone cohesion, art direction integrity, conversion clarity, and mobile resilience
+- Identified 6 verified strongest qualities: geological continuity via `Via Sacra`, museum-instrument aesthetic, zero-dependency procedural audio engine, contextual drawer docking, rock-solid 60fps performance, and dual-mode complementarity
+- Formulated Top 10 concrete observed weaknesses: boxy proxy geometry up-close, flat shading without PBR normal maps, spatial gaps in Chapters 3 & 6, water shader foam edge limits, placeholder case study imagery, lack of dust motes, rapid wheel scroll damping, avatar bank-tilt dynamics, missing inline video embeds, and mobile explore gesture guidance
+- Established Priority-Ranked 3-Tier Fix Plan (P1 real visual media, P2 physical Agora & Summit, P3 camera velocity damping, P4 procedural normal bump maps, P5 water foam refinement)
+- Formulated explicit boundaries for what NOT to polish prematurely (avoid hand-tweaking temporary proxy vertices, avoid heavy physics engines, avoid sprawling terrain expansion)
+- Verified build and dev server on port 3333
+
+---
+
 ## Current State Summary
 
 | Layer | Status |
 |-------|--------|
-| Design docs | 11 documents (including MOBILE-ADAPTATION.md), all cross-referenced |
+| Design docs | 12 documents (including VISUAL-QA-AUDIT.md), all cross-referenced |
 | Codebase | 85+ source files, builds clean, 0 type errors |
 | Test suite | Vitest unit tests active & passing (14/14 across 3 test suites) |
 | Performance | Production-hardened: ZoneCuller unmounting, throttled CPU displacement, dynamic DPR [1.0..1.75], 60fps |
