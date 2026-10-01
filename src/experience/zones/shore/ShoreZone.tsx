@@ -39,23 +39,23 @@ export function ShoreZone() {
 }
 
 // ─── Ground terrain ─────────────────────────────────────────────────────
-// FLAT ground plane. Steps and gate handle the vertical composition.
+// Covers Shore area cleanly from waterline (z = 32) to Forum steps (z = -3.5)
 
 function GroundTerrain() {
   const geometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(50, 80, 20, 30);
+    const geo = new THREE.PlaneGeometry(50, 36, 20, 20);
     const pos = geo.attributes.position;
 
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const y = pos.getY(i); // plane Y → world Z
 
-      // Very subtle undulation only — no slopes that hide objects
-      const noise = Math.sin(x * 0.4 + y * 0.3) * 0.06
-                  + Math.sin(x * 0.9) * Math.cos(y * 0.5) * 0.03;
+      // Subtle sand undulation
+      const noise = Math.sin(x * 0.4 + y * 0.3) * 0.05
+                  + Math.sin(x * 0.9) * Math.cos(y * 0.5) * 0.025;
 
-      // Water edge drop only (y > 12 → z > 15 in world)
-      const drop = y > 12 ? -(y - 12) * 0.06 : 0;
+      // Water edge drop (y > 10 → z > 24)
+      const drop = y > 10 ? -(y - 10) * 0.05 : 0;
 
       pos.setZ(i, noise + drop);
     }
@@ -67,7 +67,7 @@ function GroundTerrain() {
     <mesh
       geometry={geometry}
       rotation={[-Math.PI / 2, 0, 0]}
-      position={[0, 0, -5]}
+      position={[0, 0, 14]}
       receiveShadow
     >
       <meshStandardMaterial color={SHORE_PALETTE.sand} roughness={0.85} />
@@ -148,17 +148,11 @@ function StoneSteps() {
 
 function ScatteredRocks() {
   const rocks = useMemo(() => [
-    // Beach area
+    // Beach area rocks only (z > 0)
     { x: -9, z: 6, s: 0.7 }, { x: 10, z: 8, s: 0.55 }, { x: -11, z: 4, s: 0.9 },
     { x: 8, z: 5, s: 0.45 }, { x: -6, z: 12, s: 0.4 }, { x: 12, z: 10, s: 0.6 },
-    { x: -13, z: 9, s: 0.8 },
-    // Path sides
-    { x: -4, z: -4, s: 0.55 }, { x: 5, z: -3, s: 0.5 },
-    { x: -6, z: -8, s: 0.65 }, { x: 7, z: -7, s: 0.5 },
-    { x: -5, z: -14, s: 0.6 }, { x: 6, z: -12, s: 0.45 },
-    { x: -8, z: -18, s: 0.7 }, { x: 9, z: -16, s: 0.55 },
-    // Near beacon
-    { x: -4, z: -25, s: 0.5 }, { x: 3, z: -28, s: 0.6 },
+    { x: -13, z: 9, s: 0.8 }, { x: -7, z: 2, s: 0.55 }, { x: 7, z: 2, s: 0.5 },
+    { x: -5, z: 14, s: 0.6 }, { x: 6, z: 13, s: 0.45 },
   ], []);
 
   return (
@@ -182,22 +176,22 @@ function ScatteredRocks() {
 }
 
 // ─── Path inland ────────────────────────────────────────────────────────
-// LONG path from gate all the way toward beacon
+// Connects Shore Gate (z = 0.5) cleanly to Forum entrance steps (z = -3.5)
 
 function PathInland() {
   return (
     <group>
-      {/* Path surface — extends from z=-1 to z=-35 */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.04, -17]} receiveShadow>
-        <planeGeometry args={[2.5, 34]} />
+      {/* Path surface — from gate to forum entrance */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.04, -1.5]} receiveShadow>
+        <planeGeometry args={[2.8, 4.0]} />
         <meshStandardMaterial color={SHORE_PALETTE.sandDark} roughness={0.75} />
       </mesh>
 
-      {/* Border stones — along the full path length */}
+      {/* Border stones along connection */}
       {[-1.5, 1.5].map((x) =>
-        Array.from({ length: 10 }, (_, j) => (
-          <mesh key={`b-${x}-${j}`} position={[x, 0.06, -1 - j * 3.2]} castShadow>
-            <boxGeometry args={[0.18, 0.1, 0.55]} />
+        Array.from({ length: 3 }, (_, j) => (
+          <mesh key={`b-${x}-${j}`} position={[x, 0.08, -0.2 - j * 1.4]} castShadow>
+            <boxGeometry args={[0.2, 0.12, 0.6]} />
             <meshStandardMaterial color={COLORS.stoneShadow} roughness={0.85} />
           </mesh>
         )),

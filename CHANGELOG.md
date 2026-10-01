@@ -201,13 +201,15 @@ All notable progress on port-2026 / Island of Memory.
 ## Step 17 — Prototype Amphitheatre of Sound Zone (2026-10-01)
 
 - Created `amphitheatreConfig.ts` with 6 named cameras, palette (limestone, resonant bronze, theatre spot), and 3-stem audio model (Percussion, Harmony, Vocals)
-- Implemented `StemAudioEngine.ts`: real-time procedural Web Audio API synthesizer generating synchronized Rhythm kick, lush analog Harmony pad (Dm9), and resonant Vocal/flute melodies with 0 external files
+- Implemented `StemAudioEngine.ts`: real-time procedural Web Audio API synthesizer generating synchronized Rhythm kick, lush analog Harmony pad (Dm9), and resonant Vocal/flute melodies with auto-unlock on user gesture
+- Added interactive Sound ON/OFF equalizer button in `HUD.tsx` with animated volume bars and instant chime verification
+- Re-engineered `TieredSeating.tsx`: replaced solid CylinderGeometry wedges with true hollow 2D arc shapes (`ExtrudeGeometry`), completely removing the white obstruction covering the circular stage
+- Re-architected ground boundaries across Shore, Forum, Dino Sanctuary & Amphitheatre: eliminated all ground overlaps and Z-fighting
+- Re-routed Story camera trajectory in `StoryConfig.ts`: camera now walks directly along the stone road at eye height (y=2.0m) and glides cleanly THROUGH the Fossil Arch rather than flying over it
 - Implemented `AcousticStage.tsx`: enlarged circular marble orchestra (diameter 9.6m) with 3 concentric sound-reactive pulsing rings, monumental 2.8m bronze lyre with 5 vibrating strings, and 3 front-facing unobstructed stem steles
-- Implemented `TieredSeating.tsx`: 5 spacious semicircular Greek limestone tiers embracing the stage from behind with 4m ambulatory diazoma buffer, radial stairways (klimakes), and top-tier acoustic monoliths
-- Implemented `EchoWall.tsx`: monumental curved Skene back wall (26m wide) with wave reliefs and 3 suspended architectural linen acoustic sails (width 7m)
+- Implemented `EchoWall.tsx`: monumental curved Skene back wall (26m wide) with wave reliefs and 3 suspended architectural linen acoustic sails (width 7.2m)
 - Implemented `StageLighting.tsx`: dramatic theatrical key spotlight cutting down to the orchestra with soft penumbra, stage footlights, and twilight horizon fill
 - Resolved spatial bottlenecks in `DinoSanctuaryZone.tsx`: opened 12m wide mountain gorge pass and added continuous weathered stone trail connecting Dino Sanctuary to Amphitheatre
-- Synchronized Chapter 4 & 5 in `StoryConfig.ts` for continuous cinematic trail flight without clipping through rocks
 - Updated `manifest.json` with new amphitheatre assets
 - Verified build and dev server on port 3333
 

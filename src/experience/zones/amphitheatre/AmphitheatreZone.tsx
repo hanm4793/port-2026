@@ -40,26 +40,27 @@ export function AmphitheatreZone() {
 }
 
 // ─── Hillside Foundation Terrain ─────────────────────────────────────────────
+// Sits cleanly from z = -40 to z = -68, meeting Dino Sanctuary trail seamlessly
 
 function AmphitheatreTerrain() {
   const geometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(42, 34, 30, 24);
+    const geo = new THREE.PlaneGeometry(38, 28, 24, 20);
     const pos = geo.attributes.position;
 
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const y = pos.getY(i); // plane Y -> world Z
 
-      // Hillside slope: rises towards negative Z (inland ridge)
-      const hillSlope = Math.max(0, -y * 0.12);
+      // Gentle terrace rise towards the back wall (negative Z)
+      const terraceRise = y < 0 ? Math.abs(y) * 0.04 : 0;
 
       // Coastal falloff to the left
-      const coastalDrop = x < -10 ? Math.pow((-x - 10) / 8.0, 2) * -0.6 : 0;
+      const coastalDrop = x < -10 ? Math.pow((-x - 10) / 8.0, 2) * -0.5 : 0;
 
-      // Natural stone terrace undulation
-      const noise = Math.sin(x * 0.25) * Math.cos(y * 0.3) * 0.08;
+      // Very subtle stone terrace texture
+      const noise = Math.sin(x * 0.3) * Math.cos(y * 0.3) * 0.04;
 
-      pos.setZ(i, hillSlope + coastalDrop + noise);
+      pos.setZ(i, terraceRise + coastalDrop + noise);
     }
     geo.computeVertexNormals();
     return geo;
@@ -69,7 +70,7 @@ function AmphitheatreTerrain() {
     <mesh
       geometry={geometry}
       rotation={[-Math.PI / 2, 0, 0]}
-      position={[-3, 0.1, -52]}
+      position={[-3, 0.1, -54]}
       receiveShadow
     >
       <meshStandardMaterial

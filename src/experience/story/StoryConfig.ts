@@ -185,35 +185,35 @@ export const STORY_CHAPTERS: StoryChapter[] = [
     preloadZone: 'amphitheatre',
     beats: [
       {
-        // Beat 1: Approaching the Fossil Arch
+        // Beat 1: Walking along the road, gliding directly THROUGH the Fossil Arch at eye height
         at: 0.0,
         camera: {
-          position: [0, 4.5, -18],
-          target: [0, 2.5, -28],
-          fov: 48,
+          position: [0.0, 2.0, -16],
+          target: [0.0, 2.0, -26],
+          fov: 50,
         },
         label: '04',
         heading: 'Primeval Horizons',
-        body: 'Beyond systems lies original world-building. Directing fictional ecosystems with strict cinematographic control.',
+        body: 'Beyond systems lies original world-building. Gliding through the fossil arch into a living speculative ecosystem.',
       },
       {
-        // Beat 2: Focused on the Pipeline Altar
-        at: 0.4,
+        // Beat 2: Emerging under the arch into the basin — focused on the Altar & glowing Pool
+        at: 0.45,
         camera: {
-          position: [3.8, 3.0, -27],
+          position: [1.2, 2.2, -26],
           target: [3.5, 2.0, -31],
-          fov: 44,
+          fov: 46,
         },
         heading: 'The Generative Pipeline',
         body: 'From lore bible to 3D animatics, steered neural synthesis, and live orchestral score. No generic AI slop.',
         cta: { text: 'View Film Chronicle', href: '/projects/dinosaur-universe-chronicles' },
       },
       {
-        // Beat 3: Gliding through the open canyon gorge along the stone trail
-        at: 0.8,
+        // Beat 3: Following the weathered stone trail through the open canyon gorge
+        at: 0.82,
         camera: {
-          position: [-1.2, 3.8, -34],
-          target: [-2.5, 2.0, -44],
+          position: [-1.4, 2.5, -34],
+          target: [-2.5, 2.0, -43],
           fov: 50,
         },
         heading: 'Crafted Imagination',
@@ -231,24 +231,24 @@ export const STORY_CHAPTERS: StoryChapter[] = [
     preloadZone: 'beacon',
     beats: [
       {
-        // Beat 1: Emerging from the gorge onto the mountain trail overlooking Amphitheatre
+        // Beat 1: Emerging from the gorge along the stone trail overlooking the open theatre
         at: 0.0,
         camera: {
-          position: [-2.4, 4.2, -37],
-          target: [-3.0, 1.8, -46],
-          fov: 50,
+          position: [-2.5, 3.6, -38],
+          target: [-3.0, 1.6, -46.5],
+          fov: 52,
         },
         label: '05',
         heading: 'Resonances in Stone',
         body: 'Music is the invisible architecture of emotion. Merging classical composition, analog synthesis, and live vocal performance.',
       },
       {
-        // Beat 2: Gliding right to the stage front — unobstructed view of 3 steles & lyre
-        at: 0.4,
+        // Beat 2: Gliding right to the orchestra front — unobstructed view of 3 steles & lyre
+        at: 0.45,
         camera: {
-          position: [-3.0, 2.4, -40.5],
+          position: [-3.0, 2.2, -40.0],
           target: [-3.0, 1.8, -46.5],
-          fov: 46,
+          fov: 48,
         },
         heading: 'The Interactive Orchestra',
         body: 'Click the bronze steles on stage to isolate percussion, harmony, and lead vocal stems, or click the central lyre for audio.',
@@ -256,11 +256,11 @@ export const STORY_CHAPTERS: StoryChapter[] = [
       },
       {
         // Beat 3: Elevated theatrical diagonal overview of Greek tiers and acoustic sails
-        at: 0.8,
+        at: 0.85,
         camera: {
-          position: [3.8, 4.5, -42],
-          target: [-3.0, 2.2, -50],
-          fov: 52,
+          position: [4.2, 4.6, -41],
+          target: [-3.0, 2.4, -50],
+          fov: 54,
         },
         heading: 'Theatrical Presence',
         body: 'From conceptual albums to brand audio logos and stage vocals. Engineered with the same discipline as code.',

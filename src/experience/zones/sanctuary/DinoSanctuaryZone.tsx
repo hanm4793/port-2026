@@ -44,7 +44,7 @@ export function DinoSanctuaryZone() {
 
 function SanctuaryFloor() {
   const geometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(36, 26, 24, 20);
+    const geo = new THREE.PlaneGeometry(36, 24, 24, 20);
     const pos = geo.attributes.position;
 
     for (let i = 0; i < pos.count; i++) {
@@ -53,10 +53,10 @@ function SanctuaryFloor() {
 
       // Valley depression: center is lower, edges slope upward into cliffs
       const distFromCenter = Math.abs(x) / 16.0;
-      const valleyCup = Math.pow(distFromCenter, 2) * 1.8;
+      const valleyCup = Math.pow(distFromCenter, 2) * 1.5;
 
       // Natural undulation
-      const noise = Math.sin(x * 0.4) * Math.cos(y * 0.3) * 0.12;
+      const noise = Math.sin(x * 0.4) * Math.cos(y * 0.3) * 0.08;
 
       pos.setZ(i, valleyCup + noise);
     }
@@ -68,7 +68,7 @@ function SanctuaryFloor() {
     <mesh
       geometry={geometry}
       rotation={[-Math.PI / 2, 0, 0]}
-      position={[0, 0.1, -29]}
+      position={[0, 0.1, -28]}
       receiveShadow
     >
       <meshStandardMaterial
