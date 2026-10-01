@@ -240,16 +240,32 @@ All notable progress on port-2026 / Island of Memory.
 
 ---
 
+## Step 20 — Audio System & Sonic Architecture (2026-10-01)
+
+- Created `AUDIO-SYSTEM.md`: comprehensive audio architecture specification detailing Web Audio signal routing, procedural soundscapes, stereo vs positional distribution, tab focus dimming, and ducking rules
+- Implemented `AudioOptInModal.tsx`: elegant entry dialog ("Enter with Sound" vs "Explore in Silence") with optical brackets, providing 100% compliance with browser autoplay policies
+- Upgraded `AudioManager.ts`: procedural zero-dependency pink-noise wave synthesis for Shore, electrical data drone for Forum, primeval mist drone for Dino Sanctuary, and coordinated musical stems for Amphitheatre
+- Implemented automatic 2.5s crossfading between territorial soundscapes as user navigates Story Mode or Explore Mode
+- Implemented automatic tab focus dimming (`visibilitychange` / `blur`) ramping audio to 0.0 on background tabs and restoring on focus
+- Implemented automatic reading attenuation (`isDucked` -9dB) when opening case study drawers or reading memory seals
+- Upgraded `useAudioStore.ts` with persistent localStorage choice tracking (`port-audio-decided`, `port-audio-enabled`, `port-audio-muted`)
+- Added Vitest unit test suite `tests/unit/audio-store.test.ts` verifying all 6 stateful transitions (6/6 passing)
+- Verified build and dev server on port 3333
+
+---
+
 ## Current State Summary
 
 | Layer | Status |
 |-------|--------|
-| Design docs | 8 documents (including EXPLORE-INTERACTION.md), all cross-referenced |
-| Codebase | 76+ source files, builds clean, 0 type errors |
+| Design docs | 9 documents (including AUDIO-SYSTEM.md), all cross-referenced |
+| Codebase | 80+ source files, builds clean, 0 type errors |
+| Test suite | Vitest unit tests active & passing (6/6) |
 | Zones live | Shore of Arrival + Forum of Systems + Dino Sanctuary + Amphitheatre of Sound rendered in scene |
-| Story Mode | Active with GSAP + Lenis, 6 chapters, beat-driven camera rail |
+| Audio system | Active with procedural zone soundscapes, opt-in entry modal, auto-ducking & tab-focus dimming |
+| Story Mode | Active with GSAP + Lenis, 6 chapters, beat-driven camera rail & audio zone transitions |
 | Explore Mode | Active with museum-grade reticle, compass wayfinding, zone toasts, 4 Memory Seals & tactile audio ticks |
-| Overlays & Panels | Contextual right-side drawer (`CaseStudyPanel`) docked to 3D |
+| Overlays & Panels | Contextual right-side drawer (`CaseStudyPanel`) docked to 3D with audio ducking |
 | Routes | `/`, `/services`, `/services/[slug]`, `/projects`, `/projects/[slug]`, `/about`, `/contact`, `/api/contact` |
 | Remaining zones | Agora, Atelier (proxy exists), Temple, Beacon |
 | Mobile experience | Responsive DOM shell ready, mobile touch D-Pad active in Explore Mode |

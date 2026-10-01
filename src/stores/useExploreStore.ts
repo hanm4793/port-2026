@@ -3,6 +3,7 @@
 // =============================================================================
 
 import { create } from 'zustand';
+import { useAudioStore } from './useAudioStore';
 
 export interface MemorySeal {
   id: string;
@@ -178,6 +179,17 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
       toastTimeout = setTimeout(() => {
         set({ zoneToast: null });
       }, 3400);
+
+      // Sync Audio Zone
+      const zoneIdMap: Record<string, 'shore' | 'forum' | 'sanctuary' | 'amphitheatre'> = {
+        'Shore of Arrival': 'shore',
+        'Forum of Systems': 'forum',
+        'Dino Sanctuary': 'sanctuary',
+        'Amphitheatre of Sound': 'amphitheatre',
+      };
+      if (zoneIdMap[newZone]) {
+        useAudioStore.getState().setZone(zoneIdMap[newZone]);
+      }
     }
 
     set({
@@ -231,6 +243,17 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
       toastTimeout = setTimeout(() => {
         set({ zoneToast: null });
       }, 3400);
+
+      // Sync Audio Zone
+      const zoneIdMap: Record<string, 'shore' | 'forum' | 'sanctuary' | 'amphitheatre'> = {
+        'Shore of Arrival': 'shore',
+        'Forum of Systems': 'forum',
+        'Dino Sanctuary': 'sanctuary',
+        'Amphitheatre of Sound': 'amphitheatre',
+      };
+      if (zoneIdMap[newZone]) {
+        useAudioStore.getState().setZone(zoneIdMap[newZone]);
+      }
     }
   },
 }));

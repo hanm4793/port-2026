@@ -4,6 +4,7 @@ import { HUD } from '@/components/hud/HUD';
 import { ExploreHUD } from '@/components/explore/ExploreHUD';
 import { CaseStudyPanelWrapper } from '@/components/overlays/CaseStudyPanelWrapper';
 import { NavigationMenu } from '@/components/ui/NavigationMenu';
+import { AudioOptInModal } from '@/components/audio/AudioOptInModal';
 
 /**
  * Landing page — SSG HTML with dual-mode (Story / Explore) 3D experience.
@@ -11,6 +12,9 @@ import { NavigationMenu } from '@/components/ui/NavigationMenu';
 export default function HomePage() {
   return (
     <>
+      {/* Audio Opt-In Gate (Enter with Sound / Continue Muted) */}
+      <AudioOptInModal />
+
       {/* Story Mode chapters + scroll orchestration */}
       <StoryPageWrapper />
 

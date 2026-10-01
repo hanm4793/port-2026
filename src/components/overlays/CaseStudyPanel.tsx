@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOverlayStore } from '@/stores/useOverlayStore';
 import { useExperienceStore } from '@/stores/useExperienceStore';
+import { useAudioStore } from '@/stores/useAudioStore';
 import { projects } from '@/data/projects';
 import { services } from '@/data/services';
 import type { Project, Service } from '@/types/content';
@@ -34,6 +35,13 @@ export function CaseStudyPanel() {
     closeOverlay();
     closeDetail();
   }, [closeOverlay, closeDetail]);
+
+  useEffect(() => {
+    useAudioStore.getState().setDucked(isOpen);
+    return () => {
+      useAudioStore.getState().setDucked(false);
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;

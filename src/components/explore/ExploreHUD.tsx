@@ -11,7 +11,9 @@
 // - Fast travel waypoint controls & mobile touch D-Pad
 // =============================================================================
 
+import { useEffect } from 'react';
 import { useExperienceStore } from '@/stores/useExperienceStore';
+import { useAudioStore } from '@/stores/useAudioStore';
 import {
   useExploreStore,
   EXPLORE_WAYPOINTS,
@@ -31,6 +33,16 @@ export function ExploreHUD() {
   const interactPrompt = useExploreStore((s) => s.interactPrompt);
   const teleport = useExploreStore((s) => s.teleportToWaypoint);
   const setKey = useExploreStore((s) => s.setKey);
+
+  // Auto-duck soundscape while inspecting a memory seal
+  useEffect(() => {
+    if (activeSeal) {
+      useAudioStore.getState().setDucked(true);
+      return () => {
+        useAudioStore.getState().setDucked(false);
+      };
+    }
+  }, [activeSeal]);
 
   if (mode !== 'explore') return null;
 

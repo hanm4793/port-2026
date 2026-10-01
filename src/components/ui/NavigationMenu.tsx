@@ -3,11 +3,12 @@
 // =============================================================================
 // Navigation Menu — main persistent navbar
 // Includes direct links + live audio control button with animated equalizer bars
+// Synchronized with useAudioStore and AudioManager
 // =============================================================================
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { stemAudioEngine } from '@/experience/zones/amphitheatre/StemAudioEngine';
+import { useAudioStore } from '@/stores/useAudioStore';
+import { audioManager } from '@/experience/core/AudioManager';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Home' },
@@ -18,21 +19,18 @@ const NAV_ITEMS = [
 ];
 
 export function NavigationMenu() {
-  const [audioState, setAudioState] = useState(stemAudioEngine.getState());
+  const enabled = useAudioStore((s) => s.enabled);
+  const isMuted = useAudioStore((s) => s.isMuted);
 
-  useEffect(() => {
-    return stemAudioEngine.subscribe(setAudioState);
-  }, []);
+  const isSoundActive = enabled && !isMuted;
 
-  const isSoundActive = audioState.isRunning && !audioState.isMuted;
-
-  const handleAudioToggle = () => {
-    if (!audioState.isRunning) {
-      stemAudioEngine.init().then(() => {
-        stemAudioEngine.playLyreChime();
-      });
+  const handleAudioToggle = async () => {
+    if (!enabled || isMuted) {
+      useAudioStore.getState().optInSound();
+      await audioManager.init();
+      audioManager.playWelcomeChime();
     } else {
-      stemAudioEngine.toggleMute();
+      useAudioStore.getState().toggleAudio();
     }
   };
 
@@ -73,7 +71,7 @@ export function NavigationMenu() {
             type="button"
             onClick={handleAudioToggle}
             className="flex items-center gap-2 px-3 py-1 border border-[#3A3632] bg-[#141210] hover:border-[#C9A84C] transition-colors text-xs cursor-pointer group"
-            title={isSoundActive ? 'Click to Mute Sound' : 'Click to Enable Procedural Audio'}
+            title={isSoundActive ? 'Click to Mute Sound' : 'Click to Enable Audio Architecture'}
           >
             {/* Animated Equalizer Bars */}
             <span className="flex items-end gap-0.5 h-3">

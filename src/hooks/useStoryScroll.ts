@@ -10,6 +10,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useInputStore } from '@/stores/useInputStore';
 import { useCameraStore } from '@/stores/useCameraStore';
+import { useAudioStore } from '@/stores/useAudioStore';
 import { getChapterAtProgress, STORY_CHAPTERS } from '@/experience/story/StoryConfig';
 
 // Register plugin once
@@ -41,6 +42,17 @@ export function useStoryScroll(): StoryScrollState {
     useCameraStore.getState().setScrollProgress(progress);
 
     const { index, chapter, localProgress } = getChapterAtProgress(progress);
+
+    // Sync ambient soundscape to story chapter zone
+    if (chapter.zones.includes('shore')) {
+      useAudioStore.getState().setZone('shore');
+    } else if (chapter.zones.includes('forum') || chapter.zones.includes('agora')) {
+      useAudioStore.getState().setZone('forum');
+    } else if (chapter.zones.includes('sanctuary')) {
+      useAudioStore.getState().setZone('sanctuary');
+    } else if (chapter.zones.includes('amphitheatre') || chapter.zones.includes('beacon')) {
+      useAudioStore.getState().setZone('amphitheatre');
+    }
 
     setState({
       progress,
