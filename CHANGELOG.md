@@ -227,15 +227,28 @@ All notable progress on port-2026 / Island of Memory.
 
 ---
 
+## Step 19 — Interaction Design for Explore Mode (2026-10-01)
+
+- Created `EXPLORE-INTERACTION.md`: interaction design specification detailing the 4 deterministic states (Dormant, Proximity Detected, Focused/Ready, Inspecting), affordance rules, orientation aids, and museum-instrument principles
+- Upgraded `useExploreStore.ts` with real-time zone boundary tracking (`currentZone`), angular heading to the Summit Beacon (`beaconAngle`), and contextual `interactPrompt` state
+- Implemented Museum-Grade Optical Reticle in `ExploreHUD.tsx`: precision brass corner brackets with action verbs (e.g., `[ E · Examine System Architecture ]`) anchored directly to active targets
+- Added Summit Beacon Compass Needle in Explore top bar tracking the lodestone heading to the island apex (`[0, 14, -78]`)
+- Added cinematic Zone Entry Toasts (`[ TERRITORY ACCESSED // ZONE NAME ]`) that glide in on territorial boundary crossing
+- Implemented acoustic feedback ticks (`playHoverTick()`, `playSealUnlockChime()`) in `StemAudioEngine.ts` triggering on reticle lock and seal decryptions
+- Unified interaction targets in `ExplorePlayer.tsx` covering all 4 Memory Seals and 5 major architectural hotspots (System Table, Altar, Lyre, and Case Study Alcoves)
+- Verified build and dev server on port 3333
+
+---
+
 ## Current State Summary
 
 | Layer | Status |
 |-------|--------|
-| Design docs | 7 documents, all cross-referenced |
-| Codebase | 75+ source files, builds clean, 0 type errors |
+| Design docs | 8 documents (including EXPLORE-INTERACTION.md), all cross-referenced |
+| Codebase | 76+ source files, builds clean, 0 type errors |
 | Zones live | Shore of Arrival + Forum of Systems + Dino Sanctuary + Amphitheatre of Sound rendered in scene |
 | Story Mode | Active with GSAP + Lenis, 6 chapters, beat-driven camera rail |
-| Explore Mode | Active with kinematic Navigator avatar, third-person orbit follow camera, 4 Memory Seals & Fast Travel |
+| Explore Mode | Active with museum-grade reticle, compass wayfinding, zone toasts, 4 Memory Seals & tactile audio ticks |
 | Overlays & Panels | Contextual right-side drawer (`CaseStudyPanel`) docked to 3D |
 | Routes | `/`, `/services`, `/services/[slug]`, `/projects`, `/projects/[slug]`, `/about`, `/contact`, `/api/contact` |
 | Remaining zones | Agora, Atelier (proxy exists), Temple, Beacon |

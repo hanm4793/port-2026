@@ -71,6 +71,13 @@ export const EXPLORE_WAYPOINTS: ExploreZoneWaypoint[] = [
   { id: 'amphitheatre', name: 'Amphitheatre', position: [-3.0, 1.2, -43.0], rotationY: 0 },
 ];
 
+export interface InteractPrompt {
+  id: string;
+  title: string;
+  actionVerb: string;
+  onAction: () => void;
+}
+
 interface ExploreState {
   // Player Avatar Transform
   playerPosition: [number, number, number];
@@ -82,10 +89,18 @@ interface ExploreState {
   orbitAngleY: number; // pitch
   cameraDistance: number;
 
+  // Spatial Navigation & Compass Wayfinding
+  currentZone: string;
+  zoneToast: string | null;
+  beaconAngle: number; // Relative compass needle angle towards Summit Beacon
+
   // Discoveries
   discoveredSeals: string[];
   activeSeal: MemorySeal | null;
   nearSealId: string | null;
+
+  // Active Spatial Interaction Reticle
+  interactPrompt: InteractPrompt | null;
 
   // Keyboard input state
   keys: {
@@ -103,11 +118,29 @@ interface ExploreState {
   setCameraDistance: (dist: number) => void;
   setKey: (key: 'forward' | 'backward' | 'left' | 'right', pressed: boolean) => void;
   setNearSealId: (id: string | null) => void;
+  setInteractPrompt: (prompt: InteractPrompt | null) => void;
   discoverSeal: (id: string) => void;
   openSeal: (seal: MemorySeal) => void;
   closeSeal: () => void;
   teleportToWaypoint: (id: string) => void;
+  dismissZoneToast: () => void;
 }
+
+function getZoneNameFromZ(z: number): string {
+  if (z > 0.0) return 'Shore of Arrival';
+  if (z > -16.0) return 'Forum of Systems';
+  if (z > -40.0) return 'Dino Sanctuary';
+  return 'Amphitheatre of Sound';
+}
+
+// Summit Beacon coordinate: [0, 14, -78]
+function computeBeaconAngle(x: number, z: number): number {
+  const dx = 0 - x;
+  const dz = -78 - z;
+  return Math.atan2(dx, -dz) * (180 / Math.PI); // Angle relative to forward (-Z)
+}
+
+let toastTimeout: NodeJS.Timeout | null = null;
 
 export const useExploreStore = create<ExploreState>((set, get) => ({
   playerPosition: [0, 1.2, 5.0],
@@ -115,12 +148,17 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
   isMoving: false,
 
   orbitAngleX: 0,
-  orbitAngleY: 0.35, // slightly looking down
+  orbitAngleY: 0.35,
   cameraDistance: 6.5,
+
+  currentZone: 'Shore of Arrival',
+  zoneToast: null,
+  beaconAngle: 0,
 
   discoveredSeals: [],
   activeSeal: null,
   nearSealId: null,
+  interactPrompt: null,
 
   keys: {
     forward: false,
@@ -129,7 +167,26 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
     right: false,
   },
 
-  setPlayerPosition: (playerPosition) => set({ playerPosition }),
+  setPlayerPosition: (playerPosition) => {
+    const prevZone = get().currentZone;
+    const newZone = getZoneNameFromZ(playerPosition[2]);
+    const beaconAngle = computeBeaconAngle(playerPosition[0], playerPosition[2]);
+
+    if (newZone !== prevZone) {
+      if (toastTimeout) clearTimeout(toastTimeout);
+      set({ zoneToast: newZone });
+      toastTimeout = setTimeout(() => {
+        set({ zoneToast: null });
+      }, 3400);
+    }
+
+    set({
+      playerPosition,
+      currentZone: newZone,
+      beaconAngle,
+    });
+  },
+
   setPlayerRotationY: (playerRotationY) => set({ playerRotationY }),
   setIsMoving: (isMoving) => set({ isMoving }),
   setOrbitAngles: (orbitAngleX, orbitAngleY) => set({ orbitAngleX, orbitAngleY }),
@@ -141,6 +198,7 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
     })),
 
   setNearSealId: (nearSealId) => set({ nearSealId }),
+  setInteractPrompt: (interactPrompt) => set({ interactPrompt }),
 
   discoverSeal: (id) =>
     set((state) => {
@@ -155,6 +213,8 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
 
   closeSeal: () => set({ activeSeal: null }),
 
+  dismissZoneToast: () => set({ zoneToast: null }),
+
   teleportToWaypoint: (id) => {
     const wp = EXPLORE_WAYPOINTS.find((w) => w.id === id);
     if (wp) {
@@ -164,6 +224,13 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
         orbitAngleX: 0,
         orbitAngleY: 0.35,
       });
+      // Trigger zone toast
+      const newZone = getZoneNameFromZ(wp.position[2]);
+      if (toastTimeout) clearTimeout(toastTimeout);
+      set({ zoneToast: newZone });
+      toastTimeout = setTimeout(() => {
+        set({ zoneToast: null });
+      }, 3400);
     }
   },
 }));

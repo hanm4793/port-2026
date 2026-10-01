@@ -4,25 +4,89 @@
 // ExplorePlayer — Kinematic Navigator avatar for Explore Mode
 // Features:
 // - Luminous crystalline probe with responsive WASD / Arrow key movement
-// - Smooth rotation towards movement direction & gentle hover physics
-// - Island realm boundary clamping (x: -15..15, z: -66..18)
-// - Proximity detection to Memory Seals (triggers [E] prompt)
+// - Smooth rotation towards movement vector & gentle hover physics
+// - Island realm boundary clamping (x: -14.5..14.5, z: -66..18)
+// - Proximity detection for Memory Seals & Major Landmarks
+// - Tactile optical sound ticks when locking onto targets
 // =============================================================================
 
 import { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useExploreStore, MEMORY_SEALS } from '@/stores/useExploreStore';
+import { useExploreStore, MEMORY_SEALS, type InteractPrompt } from '@/stores/useExploreStore';
 import { useExperienceStore } from '@/stores/useExperienceStore';
+import { useOverlayStore } from '@/stores/useOverlayStore';
+import { stemAudioEngine } from '@/experience/zones/amphitheatre/StemAudioEngine';
 
 const _moveDir = new THREE.Vector3();
 const _camForward = new THREE.Vector3();
 const _camRight = new THREE.Vector3();
 
+// Major Landmark Hotspots across the island for proximity prompt
+const LANDMARK_HOTSPOTS = [
+  {
+    id: 'forum-system-table',
+    title: 'System Architecture Table',
+    actionVerb: 'Examine System Architecture',
+    position: [0, 0.5, -9] as [number, number, number],
+    dist: 3.8,
+    action: () => {
+      useExperienceStore.getState().openDetail();
+      useOverlayStore.getState().openOverlay('service', { service: 'web-development', slug: 'web-development' });
+    },
+  },
+  {
+    id: 'dino-pipeline-altar',
+    title: 'Cinematic Pipeline Altar',
+    actionVerb: 'Inspect Generative Pipeline',
+    position: [3.5, 0, -30] as [number, number, number],
+    dist: 4.2,
+    action: () => {
+      useExperienceStore.getState().openDetail();
+      useOverlayStore.getState().openOverlay('project', { slug: 'dinosaur-universe-chronicles' });
+    },
+  },
+  {
+    id: 'amphitheatre-central-lyre',
+    title: 'Acoustic Lyre Monument',
+    actionVerb: 'Play Acoustic Lyre & Read Scope',
+    position: [-3, 0.4, -46] as [number, number, number],
+    dist: 4.5,
+    action: () => {
+      stemAudioEngine.playLyreChime();
+      useExperienceStore.getState().openDetail();
+      useOverlayStore.getState().openOverlay('service', { service: 'music-sonic-identity', slug: 'music-sonic-identity' });
+    },
+  },
+  {
+    id: 'forum-alcove-web',
+    title: 'Web Analytics Platform',
+    actionVerb: 'Open Web Case Study',
+    position: [-6.4, 0.5, -14] as [number, number, number],
+    dist: 3.0,
+    action: () => {
+      useExperienceStore.getState().openDetail();
+      useOverlayStore.getState().openOverlay('project', { slug: 'enterprise-analytics-platform' });
+    },
+  },
+  {
+    id: 'forum-alcove-crm',
+    title: 'Bespoke Operations CRM',
+    actionVerb: 'Open CRM Case Study',
+    position: [-4.4, 0.5, -14] as [number, number, number],
+    dist: 3.0,
+    action: () => {
+      useExperienceStore.getState().openDetail();
+      useOverlayStore.getState().openOverlay('project', { slug: 'enterprise-crm-engine' });
+    },
+  },
+];
+
 export function ExplorePlayer() {
   const meshRef = useRef<THREE.Group>(null);
   const coreRef = useRef<THREE.Mesh>(null);
   const ringRef = useRef<THREE.Mesh>(null);
+  const lastTargetId = useRef<string | null>(null);
 
   const mode = useExperienceStore((s) => s.mode);
   const keys = useExploreStore((s) => s.keys);
@@ -33,6 +97,7 @@ export function ExplorePlayer() {
   const setIsMoving = useExploreStore((s) => s.setIsMoving);
   const orbitAngleX = useExploreStore((s) => s.orbitAngleX);
   const setNearSealId = useExploreStore((s) => s.setNearSealId);
+  const setInteractPrompt = useExploreStore((s) => s.setInteractPrompt);
   const openSeal = useExploreStore((s) => s.openSeal);
 
   // Keyboard Event Listeners
@@ -40,7 +105,6 @@ export function ExplorePlayer() {
     if (mode !== 'explore') return;
 
     const onKeyDown = (e: KeyboardEvent) => {
-      // Prevent scrolling page when moving in explore mode
       if (['KeyW', 'KeyS', 'KeyA', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
         e.preventDefault();
       }
@@ -50,12 +114,17 @@ export function ExplorePlayer() {
       if (e.code === 'KeyA' || e.code === 'ArrowLeft') setKey('left', true);
       if (e.code === 'KeyD' || e.code === 'ArrowRight') setKey('right', true);
 
-      // 'E' to interact with nearby seal
-      if (e.code === 'KeyE') {
+      // 'E' or 'Enter' or 'Space' to trigger active interactive prompt
+      if (e.code === 'KeyE' || e.code === 'Enter') {
         const state = useExploreStore.getState();
-        if (state.nearSealId) {
+        if (state.interactPrompt) {
+          state.interactPrompt.onAction();
+        } else if (state.nearSealId) {
           const target = MEMORY_SEALS.find((s) => s.id === state.nearSealId);
-          if (target) openSeal(target);
+          if (target) {
+            stemAudioEngine.playSealUnlockChime();
+            openSeal(target);
+          }
         }
       }
     };
@@ -97,9 +166,9 @@ export function ExplorePlayer() {
     if (isMoving) {
       _moveDir.normalize();
 
-      // Update position
+      // Update position with island boundaries
       const nextX = THREE.MathUtils.clamp(playerPos[0] + _moveDir.x * speed * delta, -14.5, 14.5);
-      const nextZ = THREE.MathUtils.clamp(playerPos[2] + _moveDir.z * speed * delta, -64.0, 16.0);
+      const nextZ = THREE.MathUtils.clamp(playerPos[2] + _moveDir.z * speed * delta, -65.0, 16.0);
 
       // Compute natural terrain elevation
       let groundY = 1.0;
@@ -132,18 +201,58 @@ export function ExplorePlayer() {
       ringRef.current.rotation.x = Math.PI / 2 + Math.sin(t * 1.5) * 0.15;
     }
 
-    // Check proximity to Memory Seals
-    let foundNearby: string | null = null;
+    // ── Check Proximity to Memory Seals ──────────────────────────────────
+    let foundSeal: string | null = null;
+    let candidatePrompt: InteractPrompt | null = null;
+
     for (const seal of MEMORY_SEALS) {
       const dx = playerPos[0] - seal.position[0];
       const dz = playerPos[2] - seal.position[2];
       const dist = Math.sqrt(dx * dx + dz * dz);
       if (dist < 3.2) {
-        foundNearby = seal.id;
+        foundSeal = seal.id;
+        candidatePrompt = {
+          id: seal.id,
+          title: seal.title,
+          actionVerb: 'Decrypt Memory Seal',
+          onAction: () => {
+            stemAudioEngine.playSealUnlockChime();
+            openSeal(seal);
+          },
+        };
         break;
       }
     }
-    setNearSealId(foundNearby);
+    setNearSealId(foundSeal);
+
+    // ── Check Proximity to Landmark Hotspots (if no seal nearby) ─────────
+    if (!candidatePrompt) {
+      for (const spot of LANDMARK_HOTSPOTS) {
+        const dx = playerPos[0] - spot.position[0];
+        const dz = playerPos[2] - spot.position[2];
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        if (dist < spot.dist) {
+          candidatePrompt = {
+            id: spot.id,
+            title: spot.title,
+            actionVerb: spot.actionVerb,
+            onAction: spot.action,
+          };
+          break;
+        }
+      }
+    }
+
+    // Trigger subtle acoustic tick when locking on a new target
+    const currentTargetId = candidatePrompt ? candidatePrompt.id : null;
+    if (currentTargetId !== lastTargetId.current) {
+      if (currentTargetId) {
+        stemAudioEngine.playHoverTick();
+      }
+      lastTargetId.current = currentTargetId;
+    }
+
+    setInteractPrompt(candidatePrompt);
   });
 
   if (mode !== 'explore') return null;

@@ -220,6 +220,58 @@ class StemAudioEngine {
     osc.stop(t + 1.55);
   }
 
+  /** Subtle optical dial tick when entering interactive proximity or reticle lock */
+  playHoverTick(): void {
+    if (!this.ctx || this.isMuted || this.ctx.state !== 'running') return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1480, t);
+      osc.frequency.exponentialRampToValueAtTime(800, t + 0.04);
+
+      gain.gain.setValueAtTime(0.08, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain || this.ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + 0.045);
+    } catch {
+      // Audio errors are non-critical
+    }
+  }
+
+  /** Resonant harmonic chime when discovering a Memory Seal */
+  async playSealUnlockChime(): Promise<void> {
+    await this.init();
+    if (!this.ctx || !this.masterGain || this.isMuted) return;
+
+    const chords = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+    chords.forEach((freq, idx) => {
+      if (!this.ctx || !this.masterGain) return;
+      const t = this.ctx.currentTime + idx * 0.06;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(0.2, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+
+      osc.start(t);
+      osc.stop(t + 1.25);
+    });
+  }
+
   /** Play a rich harp/lyre arpeggio chime when central lyre is clicked */
   async playLyreChime(): Promise<void> {
     await this.init();
