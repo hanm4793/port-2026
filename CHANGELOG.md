@@ -244,10 +244,12 @@ All notable progress on port-2026 / Island of Memory.
 
 - Created `AUDIO-SYSTEM.md`: comprehensive audio architecture specification detailing Web Audio signal routing, procedural soundscapes, stereo vs positional distribution, tab focus dimming, and ducking rules
 - Implemented `AudioOptInModal.tsx`: elegant entry dialog ("Enter with Sound" vs "Explore in Silence") with optical brackets, providing 100% compliance with browser autoplay policies
-- Upgraded `AudioManager.ts`: procedural zero-dependency pink-noise wave synthesis for Shore, electrical data drone for Forum, primeval mist drone for Dino Sanctuary, and coordinated musical stems for Amphitheatre
-- Implemented automatic 2.5s crossfading between territorial soundscapes as user navigates Story Mode or Explore Mode
+- Upgraded `AudioManager.ts`: procedural zero-dependency pink-noise wave synthesis for Shore, distinct 60Hz/120Hz electrical data drone & cathedral room air for Forum, deep primeval triad drone (F#2, C#3, A#3) with sub-rumble for Dino Sanctuary, and unified musical stems for Amphitheatre
+- Re-architected `StemAudioEngine.ts` to output directly into `AudioManager.zoneGains.amphitheatre` rather than directly to speakers, ensuring 3-stem musical orchestra ONLY plays when in Amphitheatre/Beacon and fades out cleanly in Shore, Forum, and Dino Sanctuary
+- Synced zone soundscape transitions cleanly across Story Mode chapters (`useStoryScroll.ts`) and Explore Mode coordinates (`useExploreStore.ts`)
+- Implemented automatic 2.0s crossfading between territorial soundscapes as user navigates Story Mode or Explore Mode
 - Implemented automatic tab focus dimming (`visibilitychange` / `blur`) ramping audio to 0.0 on background tabs and restoring on focus
-- Implemented automatic reading attenuation (`isDucked` -9dB) when opening case study drawers or reading memory seals
+- Implemented automatic reading attenuation (`isDucked` -10dB) when opening case study drawers or reading memory seals
 - Upgraded `useAudioStore.ts` with persistent localStorage choice tracking (`port-audio-decided`, `port-audio-enabled`, `port-audio-muted`)
 - Added Vitest unit test suite `tests/unit/audio-store.test.ts` verifying all 6 stateful transitions (6/6 passing)
 - Verified build and dev server on port 3333

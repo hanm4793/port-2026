@@ -44,13 +44,13 @@ export function useStoryScroll(): StoryScrollState {
     const { index, chapter, localProgress } = getChapterAtProgress(progress);
 
     // Sync ambient soundscape to story chapter zone
-    if (chapter.zones.includes('shore')) {
+    if (chapter.id === 'arrival') {
       useAudioStore.getState().setZone('shore');
-    } else if (chapter.zones.includes('forum') || chapter.zones.includes('agora')) {
+    } else if (chapter.id === 'systems' || chapter.id === 'growth') {
       useAudioStore.getState().setZone('forum');
-    } else if (chapter.zones.includes('sanctuary')) {
+    } else if (chapter.id === 'worlds') {
       useAudioStore.getState().setZone('sanctuary');
-    } else if (chapter.zones.includes('amphitheatre') || chapter.zones.includes('beacon')) {
+    } else if (chapter.id === 'art' || chapter.id === 'invitation') {
       useAudioStore.getState().setZone('amphitheatre');
     }
 

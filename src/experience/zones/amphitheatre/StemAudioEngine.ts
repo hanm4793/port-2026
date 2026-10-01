@@ -2,18 +2,19 @@
 // StemAudioEngine — real-time procedural Web Audio synthesizer for Amphitheatre
 // Generates 3 synchronized musical stems (Rhythm, Harmony, Vocals) and
 // acoustic lyre chimes using pure Web Audio API oscillators and filters.
-// Auto-unlocks on first user interaction with full browser autoplay compliance.
+// Connected directly into AudioManager's Amphitheatre channel (no separate master).
 // =============================================================================
 
 import type { AudioStemId } from './amphitheatreConfig';
 
 class StemAudioEngine {
   private ctx: AudioContext | null = null;
+  private outputNode: AudioNode | null = null;
   private isRunning = false;
   private isMuted = false;
 
   // Master and stem gain nodes
-  private masterGain: GainNode | null = null;
+  private subMasterGain: GainNode | null = null;
   private stemGains: Record<AudioStemId, GainNode | null> = {
     rhythm: null,
     harmony: null,
@@ -27,97 +28,59 @@ class StemAudioEngine {
     vocals: true,
   };
 
-  // Listeners for UI state
-  private listeners: Set<(state: { isRunning: boolean; isMuted: boolean; stems: Record<AudioStemId, boolean> }) => void> = new Set();
-
   // Intervals for rhythmic loops
   private rhythmTimer: number | null = null;
   private melodyTimer: number | null = null;
-  private unlocked = false;
 
-  constructor() {
-    // Auto-unlock audio context on first user click or touch anywhere on the page
-    if (typeof window !== 'undefined') {
-      const unlock = () => {
-        if (!this.unlocked) {
-          this.init();
-          this.unlocked = true;
-          window.removeEventListener('pointerdown', unlock);
-          window.removeEventListener('keydown', unlock);
-        }
-      };
-      window.addEventListener('pointerdown', unlock, { once: true });
-      window.addEventListener('keydown', unlock, { once: true });
+  /** Initialize or re-attach to an existing AudioContext & destination node */
+  init(sharedContext?: AudioContext, destination?: AudioNode): void {
+    if (this.isRunning && this.ctx && this.ctx.state === 'running') {
+      return;
     }
-  }
 
-  /** Subscribe to state changes (for HUD / UI controls) */
-  subscribe(callback: (state: { isRunning: boolean; isMuted: boolean; stems: Record<AudioStemId, boolean> }) => void): () => void {
-    this.listeners.add(callback);
-    callback(this.getState());
-    return () => this.listeners.delete(callback);
-  }
-
-  private notify(): void {
-    const s = this.getState();
-    this.listeners.forEach((cb) => cb(s));
-  }
-
-  getState() {
-    return {
-      isRunning: this.isRunning && !!this.ctx && this.ctx.state === 'running',
-      isMuted: this.isMuted,
-      stems: { ...this.activeState },
-    };
-  }
-
-  /** Initialize AudioContext and procedural generators */
-  async init(): Promise<void> {
     try {
-      if (!this.ctx) {
+      if (sharedContext) {
+        this.ctx = sharedContext;
+      } else if (!this.ctx) {
         const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
         this.ctx = new AudioCtx();
-
-        // Master output
-        this.masterGain = this.ctx.createGain();
-        this.masterGain.gain.setValueAtTime(this.isMuted ? 0.0 : 0.5, this.ctx.currentTime);
-        this.masterGain.connect(this.ctx.destination);
-
-        // Create stem channel gain nodes
-        (['rhythm', 'harmony', 'vocals'] as AudioStemId[]).forEach((id) => {
-          if (!this.ctx || !this.masterGain) return;
-          const gain = this.ctx.createGain();
-          gain.gain.setValueAtTime(this.activeState[id] ? 0.5 : 0.0, this.ctx.currentTime);
-          gain.connect(this.masterGain);
-          this.stemGains[id] = gain;
-        });
-
-        this.startGenerators();
-        this.isRunning = true;
       }
 
-      if (this.ctx.state === 'suspended') {
-        await this.ctx.resume();
-      }
+      this.outputNode = destination || this.ctx.destination;
 
-      this.notify();
-      console.log('[StemAudioEngine] AudioContext state:', this.ctx.state);
+      // Sub-master output for stems
+      this.subMasterGain = this.ctx.createGain();
+      this.subMasterGain.gain.setValueAtTime(this.isMuted ? 0.0 : 0.6, this.ctx.currentTime);
+      this.subMasterGain.connect(this.outputNode);
+
+      // Create stem channel gain nodes
+      (['rhythm', 'harmony', 'vocals'] as AudioStemId[]).forEach((id) => {
+        if (!this.ctx || !this.subMasterGain) return;
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(this.activeState[id] ? 0.45 : 0.0, this.ctx.currentTime);
+        gain.connect(this.subMasterGain);
+        this.stemGains[id] = gain;
+      });
+
+      this.startGenerators();
+      this.isRunning = true;
+      console.log('[StemAudioEngine] Synthesizer online and attached to zone channel.');
     } catch (e) {
-      console.warn('[StemAudioEngine] Web Audio API initialization failed:', e);
+      console.warn('[StemAudioEngine] Web Audio initialization failed:', e);
     }
   }
 
-  /** Toggle Master Mute */
-  toggleMute(): boolean {
-    this.init();
-    this.isMuted = !this.isMuted;
-    if (this.masterGain && this.ctx) {
-      const target = this.isMuted ? 0.0 : 0.5;
-      this.masterGain.gain.cancelScheduledValues(this.ctx.currentTime);
-      this.masterGain.gain.linearRampToValueAtTime(target, this.ctx.currentTime + 0.1);
+  /** Connect to an external gain channel (e.g. AudioManager.zoneGains.amphitheatre) */
+  connectTo(node: AudioNode): void {
+    this.outputNode = node;
+    if (this.subMasterGain) {
+      try {
+        this.subMasterGain.disconnect();
+        this.subMasterGain.connect(node);
+      } catch (e) {
+        console.warn('[StemAudioEngine] Reconnect failed:', e);
+      }
     }
-    this.notify();
-    return this.isMuted;
   }
 
   /** Start procedural musical generators */
@@ -151,8 +114,8 @@ class StemAudioEngine {
     const chordFrequencies = [146.83, 174.61, 220.0, 261.63]; // D3, F3, A3, C4
     const filter = this.ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(750, this.ctx.currentTime);
-    filter.Q.setValueAtTime(1.8, this.ctx.currentTime);
+    filter.frequency.setValueAtTime(800, this.ctx.currentTime);
+    filter.Q.setValueAtTime(2.0, this.ctx.currentTime);
     filter.connect(this.stemGains.harmony);
 
     chordFrequencies.forEach((freq, idx) => {
@@ -236,7 +199,7 @@ class StemAudioEngine {
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
 
       osc.connect(gain);
-      gain.connect(this.masterGain || this.ctx.destination);
+      gain.connect(this.subMasterGain || this.ctx.destination);
 
       osc.start(t);
       osc.stop(t + 0.045);
@@ -246,13 +209,12 @@ class StemAudioEngine {
   }
 
   /** Resonant harmonic chime when discovering a Memory Seal */
-  async playSealUnlockChime(): Promise<void> {
-    await this.init();
-    if (!this.ctx || !this.masterGain || this.isMuted) return;
+  playSealUnlockChime(): void {
+    if (!this.ctx || this.isMuted || this.ctx.state !== 'running') return;
 
     const chords = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
     chords.forEach((freq, idx) => {
-      if (!this.ctx || !this.masterGain) return;
+      if (!this.ctx) return;
       const t = this.ctx.currentTime + idx * 0.06;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -265,7 +227,7 @@ class StemAudioEngine {
       gain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
 
       osc.connect(gain);
-      gain.connect(this.masterGain);
+      gain.connect(this.subMasterGain || this.ctx.destination);
 
       osc.start(t);
       osc.stop(t + 1.25);
@@ -273,13 +235,12 @@ class StemAudioEngine {
   }
 
   /** Play a rich harp/lyre arpeggio chime when central lyre is clicked */
-  async playLyreChime(): Promise<void> {
-    await this.init();
-    if (!this.ctx || !this.masterGain) return;
+  playLyreChime(): void {
+    if (!this.ctx || this.isMuted || this.ctx.state !== 'running') return;
 
     const notes = [440.0, 523.25, 659.25, 783.99, 880.0]; // A4, C5, E5, G5, A5
     notes.forEach((freq, idx) => {
-      if (!this.ctx || !this.masterGain) return;
+      if (!this.ctx) return;
       const t = this.ctx.currentTime + idx * 0.08;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -292,7 +253,7 @@ class StemAudioEngine {
       gain.gain.exponentialRampToValueAtTime(0.001, t + 1.8);
 
       osc.connect(gain);
-      gain.connect(this.masterGain);
+      gain.connect(this.subMasterGain || this.ctx.destination);
 
       osc.start(t);
       osc.stop(t + 1.85);
@@ -301,21 +262,17 @@ class StemAudioEngine {
 
   /** Toggle stem on/off with smooth gain ramp */
   toggleStem(id: AudioStemId): boolean {
-    this.init();
     this.activeState[id] = !this.activeState[id];
 
     if (this.ctx && this.stemGains[id]) {
-      const targetGain = this.activeState[id] ? 0.5 : 0.0;
+      const targetGain = this.activeState[id] ? 0.45 : 0.0;
       const gainNode = this.stemGains[id]!;
       gainNode.gain.cancelScheduledValues(this.ctx.currentTime);
       gainNode.gain.linearRampToValueAtTime(targetGain, this.ctx.currentTime + 0.15);
     }
-
-    this.notify();
     return this.activeState[id];
   }
 
-  /** Get stem active state */
   isStemActive(id: AudioStemId): boolean {
     return this.activeState[id];
   }
@@ -323,10 +280,6 @@ class StemAudioEngine {
   dispose(): void {
     if (this.rhythmTimer) clearInterval(this.rhythmTimer);
     if (this.melodyTimer) clearInterval(this.melodyTimer);
-    if (this.ctx) {
-      this.ctx.close();
-      this.ctx = null;
-    }
     this.isRunning = false;
   }
 }

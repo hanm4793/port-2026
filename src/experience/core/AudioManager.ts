@@ -2,7 +2,7 @@
 // AudioManager — central Web Audio API engine for Island of Memory
 // Features:
 // - Procedural zero-dependency ambient soundscapes for Shore, Forum, Dino & Amphitheatre
-// - Automatic crossfading (2.5s) between territorial soundscapes
+// - Automatic crossfading (2.0s) between territorial soundscapes
 // - Automatic tab focus dimming (visibilitychange & blur/focus)
 // - Dynamic ducking (-8dB) when reading case studies or discovering seals
 // - Seamless synchronization with useAudioStore
@@ -29,7 +29,6 @@ class AudioManager {
 
   private currentZone: ZoneAudioId = 'shore';
   private initialized = false;
-  private isTabVisible = true;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -50,7 +49,6 @@ class AudioManager {
   };
 
   private setTabFocus(focused: boolean) {
-    this.isTabVisible = focused;
     if (!this.ctx || !this.visibilityGain) return;
 
     const t = this.ctx.currentTime;
@@ -66,14 +64,14 @@ class AudioManager {
 
     // Master volume / mute
     if (this.masterGain) {
-      const targetVol = state.enabled && !state.isMuted ? 0.5 : 0.0;
+      const targetVol = state.enabled && !state.isMuted ? 0.6 : 0.0;
       this.masterGain.gain.cancelScheduledValues(t);
       this.masterGain.gain.linearRampToValueAtTime(targetVol, t + 0.15);
     }
 
     // Ducking (when reading drawer / modal)
     if (this.duckingGain) {
-      const duckTarget = state.isDucked ? 0.35 : 1.0; // -9dB duck
+      const duckTarget = state.isDucked ? 0.3 : 1.0; // -10dB duck
       this.duckingGain.gain.cancelScheduledValues(t);
       this.duckingGain.gain.linearRampToValueAtTime(duckTarget, t + 0.25);
     }
@@ -103,7 +101,7 @@ class AudioManager {
       this.visibilityGain.connect(this.ctx.destination);
 
       this.masterGain = this.ctx.createGain();
-      const initialVol = useAudioStore.getState().enabled && !useAudioStore.getState().isMuted ? 0.5 : 0.0;
+      const initialVol = useAudioStore.getState().enabled && !useAudioStore.getState().isMuted ? 0.6 : 0.0;
       this.masterGain.gain.setValueAtTime(initialVol, this.ctx.currentTime);
       this.masterGain.connect(this.visibilityGain);
 
@@ -112,46 +110,56 @@ class AudioManager {
       this.duckingGain.connect(this.masterGain);
 
       // Create individual zone channel gain nodes
+      const activeInitialZone = useAudioStore.getState().currentZone || 'shore';
+      this.currentZone = activeInitialZone;
+
       (['shore', 'forum', 'sanctuary', 'amphitheatre'] as ZoneAudioId[]).forEach((z) => {
         if (!this.ctx || !this.duckingGain) return;
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(z === this.currentZone ? 0.4 : 0.0, this.ctx.currentTime);
+        gain.gain.setValueAtTime(z === this.currentZone ? 0.5 : 0.0, this.ctx.currentTime);
         gain.connect(this.duckingGain);
         this.zoneGains[z] = gain;
       });
 
-      // Build procedural generators
+      // 1. Shore Soundscape (Ocean surf + waves)
       this.createShoreSoundscape();
+
+      // 2. Forum Soundscape (Resonant electrical data hum + stone echo)
       this.createForumSoundscape();
+
+      // 3. Dino Sanctuary Soundscape (Primeval breeze + mineral harmonic hum)
       this.createSanctuarySoundscape();
 
-      // Amphitheatre stem synthesizer starts in sync
-      stemAudioEngine.init();
+      // 4. Amphitheatre Stem Engine (routed directly through amphitheatre zone channel)
+      if (this.zoneGains.amphitheatre) {
+        stemAudioEngine.init(this.ctx, this.zoneGains.amphitheatre);
+      }
 
       if (this.ctx.state === 'suspended') {
         await this.ctx.resume();
       }
 
       this.initialized = true;
-      console.log('[AudioManager] Procedural audio pipeline online.');
+      console.log(`[AudioManager] Procedural audio pipeline online. Active zone: ${this.currentZone}`);
     } catch (e) {
       console.warn('[AudioManager] Failed to initialize AudioContext:', e);
     }
   }
 
-  /** Transition soundscape to a new zone with smooth 2.5s crossfade */
+  /** Transition soundscape to a new zone with smooth 2.0s crossfade */
   transitionToZone(zoneId: ZoneAudioId): void {
+    console.log(`[AudioManager] Transitioning soundscape: ${this.currentZone} -> ${zoneId}`);
     this.currentZone = zoneId;
     if (!this.ctx) return;
 
     const t = this.ctx.currentTime;
-    const fadeDuration = 2.5;
+    const fadeDuration = 2.0;
 
     (['shore', 'forum', 'sanctuary', 'amphitheatre'] as ZoneAudioId[]).forEach((z) => {
       const gain = this.zoneGains[z];
       if (!gain || !this.ctx) return;
 
-      const target = z === zoneId ? 0.4 : 0.0;
+      const target = z === zoneId ? 0.5 : 0.0;
       gain.gain.cancelScheduledValues(t);
       gain.gain.linearRampToValueAtTime(target, t + fadeDuration);
     });
@@ -173,7 +181,7 @@ class AudioManager {
       b3 = 0.86650 * b3 + white * 0.3104856;
       b4 = 0.55000 * b4 + white * 0.5329522;
       b5 = -0.7616 * b5 - white * 0.0168980;
-      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.15;
       b6 = white * 0.115926;
     }
     return buffer;
@@ -193,15 +201,15 @@ class AudioManager {
     // Resonant lowpass filter modulated by wave LFO
     const filter = this.ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(450, this.ctx.currentTime);
-    filter.Q.setValueAtTime(2.2, this.ctx.currentTime);
+    filter.frequency.setValueAtTime(420, this.ctx.currentTime);
+    filter.Q.setValueAtTime(2.5, this.ctx.currentTime);
 
     // LFO: 0.18Hz (wave swell period ~5.5s)
     const lfo = this.ctx.createOscillator();
     lfo.frequency.setValueAtTime(0.18, this.ctx.currentTime);
 
     const lfoGain = this.ctx.createGain();
-    lfoGain.gain.setValueAtTime(320, this.ctx.currentTime);
+    lfoGain.gain.setValueAtTime(360, this.ctx.currentTime);
 
     lfo.connect(lfoGain);
     lfoGain.connect(filter.frequency);
@@ -213,27 +221,33 @@ class AudioManager {
     lfo.start();
   }
 
-  /** Forum: Resonant data hum + stone room tone */
+  /** Forum: Resonant electrical data hum + cathedral stone room tone */
   private createForumSoundscape(): void {
     if (!this.ctx || !this.zoneGains.forum) return;
 
-    // Low sub sine hum (60Hz & 120Hz harmonic)
-    const subOsc = this.ctx.createOscillator();
-    subOsc.type = 'sine';
-    subOsc.frequency.setValueAtTime(60, this.ctx.currentTime);
+    // 1. Deep 60Hz and 120Hz transformer hum
+    const humOsc1 = this.ctx.createOscillator();
+    humOsc1.type = 'sine';
+    humOsc1.frequency.setValueAtTime(60, this.ctx.currentTime);
 
-    const subGain = this.ctx.createGain();
-    subGain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+    const humOsc2 = this.ctx.createOscillator();
+    humOsc2.type = 'triangle';
+    humOsc2.frequency.setValueAtTime(120, this.ctx.currentTime);
 
-    subOsc.connect(subGain);
-    subGain.connect(this.zoneGains.forum);
-    subOsc.start();
+    const humGain = this.ctx.createGain();
+    humGain.gain.setValueAtTime(0.18, this.ctx.currentTime);
 
-    // High electrical air tone (840Hz subtle chime)
+    humOsc1.connect(humGain);
+    humOsc2.connect(humGain);
+    humGain.connect(this.zoneGains.forum);
+    humOsc1.start();
+    humOsc2.start();
+
+    // 2. High electrical air resonance (920Hz harmonic chime)
     const airFilter = this.ctx.createBiquadFilter();
     airFilter.type = 'bandpass';
-    airFilter.frequency.setValueAtTime(840, this.ctx.currentTime);
-    airFilter.Q.setValueAtTime(4.0, this.ctx.currentTime);
+    airFilter.frequency.setValueAtTime(920, this.ctx.currentTime);
+    airFilter.Q.setValueAtTime(4.5, this.ctx.currentTime);
 
     const noiseBuffer = this.createNoiseBuffer();
     if (noiseBuffer) {
@@ -242,7 +256,7 @@ class AudioManager {
       airNoise.loop = true;
 
       const airGain = this.ctx.createGain();
-      airGain.gain.setValueAtTime(0.03, this.ctx.currentTime);
+      airGain.gain.setValueAtTime(0.08, this.ctx.currentTime);
 
       airNoise.connect(airFilter);
       airFilter.connect(airGain);
@@ -255,22 +269,42 @@ class AudioManager {
   private createSanctuarySoundscape(): void {
     if (!this.ctx || !this.zoneGains.sanctuary) return;
 
-    // Mysterious chord drone (F# / C# / G#)
-    const chordNotes = [92.5, 138.59, 207.65]; // F#2, C#3, G#3
+    // Rich ancient drone chord (F#2 = 92.5Hz, C#3 = 138.6Hz, A#3 = 233.1Hz)
+    const chordNotes = [92.5, 138.59, 233.08];
     chordNotes.forEach((freq, idx) => {
       if (!this.ctx || !this.zoneGains.sanctuary) return;
       const osc = this.ctx.createOscillator();
-      osc.type = 'triangle';
+      osc.type = idx === 0 ? 'sine' : 'triangle';
       osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      osc.detune.setValueAtTime((idx - 1) * 7, this.ctx.currentTime);
+      osc.detune.setValueAtTime((idx - 1) * 6, this.ctx.currentTime);
 
       const gain = this.ctx.createGain();
-      gain.gain.setValueAtTime(0.025, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.09, this.ctx.currentTime);
 
       osc.connect(gain);
       gain.connect(this.zoneGains.sanctuary);
       osc.start();
     });
+
+    // Subterranean pulse (sub bass rumble)
+    const rumbleFilter = this.ctx.createBiquadFilter();
+    rumbleFilter.type = 'lowpass';
+    rumbleFilter.frequency.setValueAtTime(110, this.ctx.currentTime);
+
+    const noiseBuffer = this.createNoiseBuffer();
+    if (noiseBuffer) {
+      const rumbleNoise = this.ctx.createBufferSource();
+      rumbleNoise.buffer = noiseBuffer;
+      rumbleNoise.loop = true;
+
+      const rumbleGain = this.ctx.createGain();
+      rumbleGain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+
+      rumbleNoise.connect(rumbleFilter);
+      rumbleFilter.connect(rumbleGain);
+      rumbleGain.connect(this.zoneGains.sanctuary);
+      rumbleNoise.start();
+    }
   }
 
   /** Play welcome initiation chime */
@@ -287,7 +321,7 @@ class AudioManager {
       osc.frequency.setValueAtTime(freq, t);
 
       gain.gain.setValueAtTime(0.001, t);
-      gain.gain.linearRampToValueAtTime(0.25, t + 0.04);
+      gain.gain.linearRampToValueAtTime(0.35, t + 0.04);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
 
       osc.connect(gain);
