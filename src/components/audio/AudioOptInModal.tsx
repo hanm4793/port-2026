@@ -4,6 +4,7 @@
 // AudioOptInModal — "Enter with Sound / Continue Muted" Gate
 // Ensures 100% compliance with browser autoplay restrictions while setting a
 // premium storytelling tone on arrival.
+// Only renders on client after mount and check against localStorage.
 // =============================================================================
 
 import { useState, useEffect } from 'react';
@@ -11,15 +12,16 @@ import { useAudioStore } from '@/stores/useAudioStore';
 import { audioManager } from '@/experience/core/AudioManager';
 
 export function AudioOptInModal() {
+  const [mounted, setMounted] = useState(false);
   const hasUserDecided = useAudioStore((s) => s.hasUserDecided);
+  const initClientStorage = useAudioStore((s) => s.initClientStorage);
   const optIn = useAudioStore((s) => s.optInSound);
   const optOut = useAudioStore((s) => s.optOutSound);
 
-  const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
+    initClientStorage();
     setMounted(true);
-  }, []);
+  }, [initClientStorage]);
 
   if (!mounted || hasUserDecided) return null;
 

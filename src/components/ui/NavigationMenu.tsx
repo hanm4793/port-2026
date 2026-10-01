@@ -3,9 +3,10 @@
 // =============================================================================
 // Navigation Menu — main persistent navbar
 // Includes direct links + live audio control button with animated equalizer bars
-// Synchronized with useAudioStore and AudioManager
+// Clean client hydration pattern with mounted check to avoid SSR mismatch.
 // =============================================================================
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAudioStore } from '@/stores/useAudioStore';
 import { audioManager } from '@/experience/core/AudioManager';
@@ -19,10 +20,18 @@ const NAV_ITEMS = [
 ];
 
 export function NavigationMenu() {
+  const [mounted, setMounted] = useState(false);
+
   const enabled = useAudioStore((s) => s.enabled);
   const isMuted = useAudioStore((s) => s.isMuted);
+  const initClientStorage = useAudioStore((s) => s.initClientStorage);
 
-  const isSoundActive = enabled && !isMuted;
+  useEffect(() => {
+    initClientStorage();
+    setMounted(true);
+  }, [initClientStorage]);
+
+  const isSoundActive = mounted && enabled && !isMuted;
 
   const handleAudioToggle = async () => {
     if (!enabled || isMuted) {
