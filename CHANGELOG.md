@@ -215,16 +215,28 @@ All notable progress on port-2026 / Island of Memory.
 
 ---
 
+## Step 18 — Build Explore Mode (2026-10-01)
+
+- Created `useExploreStore.ts`: comprehensive Explore Mode state store coordinating avatar transform, camera orbit angles, 4 discoverable Memory Seals, fast travel waypoints, and keyboard inputs
+- Implemented `ExplorePlayer.tsx`: kinematic Archaeological Seeker / Navigator avatar with responsive WASD / Arrow key movement (7.5 m/s), smooth rotation toward movement vector, terrain boundary clamping (x: -14.5..14.5, z: -64..16), and proximity detection for Memory Seals
+- Implemented `ExploreFollowCamera.tsx`: elevated third-person follow camera with mouse drag orbit (yaw & pitch clamp 0.15..1.25), scroll wheel zoom (3.5m..14.0m), and smooth target damping without pointer lock
+- Implemented `MemoryGlyphs.tsx`: 4 archaeological discovery seals located in Shore, Forum, Dino Sanctuary, and Amphitheatre with rotating crystalline relics, glowing ground rings, and behind-the-scenes engineering/narrative lore
+- Implemented `ExploreHUD.tsx`: complete Explore Mode overlay including "Return to Guided Story" button, Memory Seals tracker (X / 4), Fast Travel waypoint bar (Shore, Forum, Sanctuary, Amphitheatre), keyboard controls guide, nearby [E] inspect prompt, interactive Seal modal, and mobile touch D-Pad
+- Mounted `ExplorePlayer`, `ExploreFollowCamera`, `MemoryGlyphs`, and `ExploreHUD` in `Experience.tsx` and `page.tsx`
+- Verified build and dev server on port 3333
+
+---
+
 ## Current State Summary
 
 | Layer | Status |
 |-------|--------|
 | Design docs | 7 documents, all cross-referenced |
-| Codebase | 70+ source files, builds clean, 0 type errors |
+| Codebase | 75+ source files, builds clean, 0 type errors |
 | Zones live | Shore of Arrival + Forum of Systems + Dino Sanctuary + Amphitheatre of Sound rendered in scene |
 | Story Mode | Active with GSAP + Lenis, 6 chapters, beat-driven camera rail |
-| Explore Mode | Toggleable via Shore orb or UI, activates OrbitControls |
+| Explore Mode | Active with kinematic Navigator avatar, third-person orbit follow camera, 4 Memory Seals & Fast Travel |
 | Overlays & Panels | Contextual right-side drawer (`CaseStudyPanel`) docked to 3D |
 | Routes | `/`, `/services`, `/services/[slug]`, `/projects`, `/projects/[slug]`, `/about`, `/contact`, `/api/contact` |
 | Remaining zones | Agora, Atelier (proxy exists), Temple, Beacon |
-| Mobile experience | Responsive DOM shell ready, dedicated mobile 2D scroll layout pending |
+| Mobile experience | Responsive DOM shell ready, mobile touch D-Pad active in Explore Mode |

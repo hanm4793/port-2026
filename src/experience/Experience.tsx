@@ -18,6 +18,9 @@ import { ForumZone } from './zones/forum/ForumZone';
 import { DinoSanctuaryZone } from './zones/sanctuary/DinoSanctuaryZone';
 import { AmphitheatreZone } from './zones/amphitheatre/AmphitheatreZone';
 import { StoryCameraRail } from './story/StoryCameraRail';
+import { ExplorePlayer } from './explore/ExplorePlayer';
+import { ExploreFollowCamera } from './explore/ExploreFollowCamera';
+import { MemoryGlyphs } from './explore/MemoryGlyphs';
 import { CAMERA_NEAR, CAMERA_FAR } from '@/lib/constants';
 import { SHORE_CAMERAS } from './zones/shore/shoreConfig';
 
@@ -78,16 +81,13 @@ export function Experience() {
         {/* Story Mode: scroll-driven camera rail */}
         {mode === 'story' && <StoryCameraRail />}
 
-        {/* Explore Mode: orbit controls for free inspection */}
+        {/* Explore Mode: Kinematic Navigator avatar + third-person follow camera + discovery seals */}
         {mode === 'explore' && (
-          <OrbitControls
-            target={SHORE_CAMERAS.hero.target}
-            enableDamping
-            dampingFactor={0.05}
-            minDistance={3}
-            maxDistance={60}
-            maxPolarAngle={Math.PI * 0.48}
-          />
+          <>
+            <ExplorePlayer />
+            <ExploreFollowCamera />
+            <MemoryGlyphs />
+          </>
         )}
 
         {process.env.NODE_ENV === 'development' && <Stats />}
