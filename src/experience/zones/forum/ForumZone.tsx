@@ -2,16 +2,15 @@
 
 // =============================================================================
 // Forum of Systems — main zone component
-// =============================================================================
 //
 // LAYOUT: A symmetrical stone forum with colonnades on both sides,
-// System Table at center, and archive alcoves at the back.
-// Cleaner and more geometric than Shore.
+// System Table at center, project archive alcoves along back wings,
+// and a GRAND OPEN PORTAL with open bronze gates revealing the road ahead!
 //
-// z=-4  entrance (from Shore path)
-// z=-8  System Table (center)
-// z=-12 archive alcoves
-// z=-14 back wall / exit
+// z = -3.5  Entrance steps (from Shore path)
+// z = -9.0  System Table (center)
+// z = -14.5 Grand Exit Portal with OPEN BRONZE GATES leading to mountain road
+// =============================================================================
 
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -24,14 +23,14 @@ import { InteractiveObject } from '@/experience/interaction/InteractiveObject';
 export function ForumZone() {
   return (
     <group>
-      {/* Ground */}
+      {/* Ground Floor */}
       <ForumFloor />
 
       {/* Colonnades — left and right */}
       <Colonnade side="left" />
       <Colonnade side="right" />
 
-      {/* Entrance arch */}
+      {/* Entrance arch from Shore */}
       <EntranceArch />
 
       {/* System Table — hero landmark */}
@@ -40,14 +39,11 @@ export function ForumZone() {
       {/* Signal nodes — interactive system visualization */}
       <SignalNodes />
 
-      {/* Archive alcoves at back */}
+      {/* Archive alcoves on left and right wings */}
       <ArchiveAlcoves />
 
-      {/* Back wall */}
-      <mesh position={[0, 2, -14.5]} castShadow receiveShadow>
-        <boxGeometry args={[17, 4, 0.4]} />
-        <meshStandardMaterial color={FORUM_PALETTE.wallStone} roughness={0.55} />
-      </mesh>
+      {/* Grand Open Exit Portal with open bronze doors & connecting road */}
+      <ForumExitPortal />
 
       {/* Data current lines in floor */}
       <FloorCircuits />
@@ -59,7 +55,6 @@ export function ForumZone() {
 }
 
 // ─── Forum floor ────────────────────────────────────────────────────────
-// Raised stone floor with grid pattern
 
 function ForumFloor() {
   return (
@@ -100,7 +95,6 @@ function ForumFloor() {
 }
 
 // ─── Colonnade ──────────────────────────────────────────────────────────
-// Row of columns on each side forming a covered walkway
 
 function Colonnade({ side }: { side: 'left' | 'right' }) {
   const x = side === 'left' ? -7 : 7;
@@ -166,7 +160,7 @@ function EntranceArch() {
         <meshStandardMaterial
           color="#2A2624"
           emissive={FORUM_PALETTE.circuitPrimary}
-          emissiveIntensity={0.4}
+          emissiveIntensity={0.5}
           roughness={0.1}
         />
       </mesh>
@@ -174,8 +168,107 @@ function EntranceArch() {
   );
 }
 
+// ─── Grand Exit Portal & Open Bronze Gates ──────────────────────────────────
+// Monumental gateway at z = -14.5 with open bronze doors revealing the path ahead!
+
+function ForumExitPortal() {
+  return (
+    <group position={[0, 0.5, -14.5]}>
+      {/* Left Back Wall Wing */}
+      <mesh position={[-6.2, 2.0, 0]} castShadow receiveShadow>
+        <boxGeometry args={[5.2, 4.0, 0.4]} />
+        <meshStandardMaterial color={FORUM_PALETTE.wallStone} roughness={0.55} />
+      </mesh>
+
+      {/* Right Back Wall Wing */}
+      <mesh position={[6.2, 2.0, 0]} castShadow receiveShadow>
+        <boxGeometry args={[5.2, 4.0, 0.4]} />
+        <meshStandardMaterial color={FORUM_PALETTE.wallStone} roughness={0.55} />
+      </mesh>
+
+      {/* ── Monumental Gateway Pillars ──────────────────────────────────── */}
+      {/* Left Gatepost */}
+      <mesh position={[-3.2, 2.3, 0]} castShadow>
+        <boxGeometry args={[0.7, 4.6, 0.7]} />
+        <meshStandardMaterial color={FORUM_PALETTE.pillarMarble} roughness={0.32} />
+      </mesh>
+      {/* Right Gatepost */}
+      <mesh position={[3.2, 2.3, 0]} castShadow>
+        <boxGeometry args={[0.7, 4.6, 0.7]} />
+        <meshStandardMaterial color={FORUM_PALETTE.pillarMarble} roughness={0.32} />
+      </mesh>
+
+      {/* Lintel Beam Overhead */}
+      <mesh position={[0, 4.6, 0]} castShadow>
+        <boxGeometry args={[7.4, 0.5, 0.8]} />
+        <meshStandardMaterial color={FORUM_PALETTE.wallStone} roughness={0.4} />
+      </mesh>
+
+      {/* Luminous Arch Inscription */}
+      <mesh position={[0, 4.6, 0.42]}>
+        <planeGeometry args={[4.5, 0.24]} />
+        <meshStandardMaterial
+          color="#2A2624"
+          emissive={FORUM_PALETTE.circuitPrimary}
+          emissiveIntensity={0.6}
+          roughness={0.1}
+        />
+      </mesh>
+
+      {/* ── Two Ancient Bronze Gate Doors Swung Wide Open at 60 Degrees ─── */}
+      {/* Left Bronze Door (Swung outward toward negative Z) */}
+      <group position={[-2.8, 0, 0]} rotation={[0, -Math.PI * 0.35, 0]}>
+        <mesh position={[-1.25, 2.0, 0]} castShadow receiveShadow>
+          <boxGeometry args={[2.5, 4.0, 0.1]} />
+          <meshStandardMaterial
+            color="#6B4E2A"
+            roughness={0.35}
+            metalness={0.8}
+          />
+        </mesh>
+        {/* Bronze Studs & Relief Band */}
+        <mesh position={[-1.25, 2.0, 0.06]}>
+          <boxGeometry args={[2.3, 0.25, 0.04]} />
+          <meshStandardMaterial color="#8B6D3A" roughness={0.25} metalness={0.85} />
+        </mesh>
+      </group>
+
+      {/* Right Bronze Door (Swung outward toward negative Z) */}
+      <group position={[2.8, 0, 0]} rotation={[0, Math.PI * 0.35, 0]}>
+        <mesh position={[1.25, 2.0, 0]} castShadow receiveShadow>
+          <boxGeometry args={[2.5, 4.0, 0.1]} />
+          <meshStandardMaterial
+            color="#6B4E2A"
+            roughness={0.35}
+            metalness={0.8}
+          />
+        </mesh>
+        {/* Bronze Studs & Relief Band */}
+        <mesh position={[1.25, 2.0, 0.06]}>
+          <boxGeometry args={[2.3, 0.25, 0.04]} />
+          <meshStandardMaterial color="#8B6D3A" roughness={0.25} metalness={0.85} />
+        </mesh>
+      </group>
+
+      {/* ── Continuous Paved Road Leading Out Through the Portal ─────────── */}
+      {/* Extends cleanly from z = -14.5 through the doors to z = -18 */}
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, 0.02, -1.8]}
+        receiveShadow
+      >
+        <planeGeometry args={[4.8, 4.2]} />
+        <meshStandardMaterial color="#8A7E6E" roughness={0.8} />
+      </mesh>
+
+      {/* Lantern Sconces on Pillars */}
+      <pointLight position={[-3.2, 2.8, 0.5]} color="#FFD4A0" intensity={0.8} distance={6} />
+      <pointLight position={[3.2, 2.8, 0.5]} color="#FFD4A0" intensity={0.8} distance={6} />
+    </group>
+  );
+}
+
 // ─── Signal nodes ───────────────────────────────────────────────────────
-// Interactive: 5 nodes connected by circuit lines forming a system diagram
 
 function SignalNodes() {
   const nodes = [
@@ -188,16 +281,13 @@ function SignalNodes() {
 
   return (
     <group>
-      {/* Connection lines between nodes */}
-      <NodeConnections nodes={nodes.map(n => n.pos)} />
-
-      {/* Interactive signal router */}
+      <NodeConnections nodes={nodes.map((n) => n.pos)} />
       <InteractiveObject
         config={{
           id: 'forum-signal-router',
           zone: 'forum',
           overlayId: 'service',
-          overlayData: { service: 'crm-systems' },
+          overlayData: { service: 'crm-systems', slug: 'crm-systems' },
         }}
       >
         <group>
@@ -210,7 +300,11 @@ function SignalNodes() {
   );
 }
 
-function SystemNode({ position, color, index }: {
+function SystemNode({
+  position,
+  color,
+  index,
+}: {
   position: [number, number, number];
   color: string;
   index: number;
@@ -220,7 +314,6 @@ function SystemNode({ position, color, index }: {
   useFrame(({ clock }) => {
     if (!meshRef.current) return;
     const t = clock.elapsedTime;
-    // Gentle float + rotation
     meshRef.current.position.y = position[1] + Math.sin(t * 1.0 + index * 1.3) * 0.06;
     meshRef.current.rotation.y = t * 0.3 + index;
     meshRef.current.rotation.x = Math.sin(t * 0.5 + index) * 0.1;
@@ -242,8 +335,6 @@ function SystemNode({ position, color, index }: {
   );
 }
 
-// ─── Node connections (circuit lines between nodes) ─────────────────────
-
 function NodeConnections({ nodes }: { nodes: readonly (readonly [number, number, number])[] }) {
   const groupRef = useRef<THREE.Group>(null);
 
@@ -258,7 +349,6 @@ function NodeConnections({ nodes }: { nodes: readonly (readonly [number, number,
     });
   });
 
-  // Connect sequential nodes
   const connections: Array<{ from: readonly [number, number, number]; to: readonly [number, number, number] }> = [];
   for (let i = 0; i < nodes.length - 1; i++) {
     connections.push({ from: nodes[i], to: nodes[i + 1] });
@@ -293,51 +383,46 @@ function NodeConnections({ nodes }: { nodes: readonly (readonly [number, number,
 }
 
 // ─── Archive alcoves ────────────────────────────────────────────────────
-// Project hotspots — each alcove opens a case study panel
+// Situated on the left and right wings so the central corridor is completely clear!
 
 function ArchiveAlcoves() {
   const alcoves = [
-    { x: -5, label: 'Web', projectSlug: 'placeholder-web-app' },
-    { x: -2.5, label: 'Apps', projectSlug: null },
-    { x: 0, label: 'CRM', projectSlug: 'placeholder-crm' },
-    { x: 2.5, label: 'Auto', projectSlug: null },
-    { x: 5, label: 'API', projectSlug: null },
+    // Left Wing (Web & CRM case studies)
+    { x: -6.4, z: -14.0, label: 'Web', projectSlug: 'enterprise-analytics-platform' },
+    { x: -4.4, z: -14.0, label: 'CRM', projectSlug: 'enterprise-crm-engine' },
+    // Right Wing (Apps & Automation)
+    { x: 4.4, z: -14.0, label: 'Apps', projectSlug: 'field-operations-mobile-suite' },
+    { x: 6.4, z: -14.0, label: 'Auto', projectSlug: null },
   ];
 
   return (
     <group>
       {alcoves.map((alcove, i) => {
         const alcoveGroup = (
-          <group key={i} position={[alcove.x, 0.5, -13.5]}>
+          <group key={i} position={[alcove.x, 0.5, alcove.z]}>
             {/* Alcove recess */}
             <mesh position={[0, 1.5, 0]} receiveShadow>
-              <boxGeometry args={[1.8, 2.5, 0.6]} />
+              <boxGeometry args={[1.6, 2.5, 0.5]} />
               <meshStandardMaterial color={FORUM_PALETTE.archiveDark} roughness={0.8} />
             </mesh>
             {/* Alcove frame */}
-            <mesh position={[0, 1.5, 0.32]} castShadow>
-              <boxGeometry args={[2, 2.8, 0.05]} />
+            <mesh position={[0, 1.5, 0.26]} castShadow>
+              <boxGeometry args={[1.8, 2.7, 0.05]} />
               <meshStandardMaterial color={FORUM_PALETTE.wallStone} roughness={0.5} />
             </mesh>
-            {/* Inner opening */}
-            <mesh position={[0, 1.5, 0.35]}>
-              <boxGeometry args={[1.5, 2.2, 0.02]} />
-              <meshStandardMaterial color={FORUM_PALETTE.archiveDark} roughness={0.9} />
-            </mesh>
-            {/* Glow accent — brighter if has project */}
-            <mesh position={[0, 2.85, 0.33]}>
-              <boxGeometry args={[1.6, 0.04, 0.04]} />
+            {/* Glow accent */}
+            <mesh position={[0, 2.8, 0.28]}>
+              <boxGeometry args={[1.4, 0.05, 0.04]} />
               <meshStandardMaterial
                 color={alcove.projectSlug ? FORUM_PALETTE.nodeActive : FORUM_PALETTE.circuitPrimary}
                 emissive={alcove.projectSlug ? FORUM_PALETTE.nodeActive : FORUM_PALETTE.circuitPrimary}
-                emissiveIntensity={alcove.projectSlug ? 0.8 : 0.3}
+                emissiveIntensity={alcove.projectSlug ? 0.9 : 0.3}
                 roughness={0.05}
               />
             </mesh>
           </group>
         );
 
-        // Wrap with InteractiveObject if this alcove has a project
         if (alcove.projectSlug) {
           return (
             <InteractiveObject
@@ -377,15 +462,15 @@ function FloorCircuits() {
   });
 
   const lines = [
-    // Main data highway — center line from entrance to table
+    // Main data highway leading straight from entrance through table to open portal
     { pos: [0, 0.51, -6.5] as const, size: [0.04, 0.005, 6] as const },
+    { pos: [0, 0.51, -12.0] as const, size: [0.04, 0.005, 5] as const },
     // Branch lines to signal nodes
     { pos: [-1.5, 0.51, -8] as const, size: [3, 0.005, 0.03] as const },
     { pos: [1.5, 0.51, -9] as const, size: [3, 0.005, 0.03] as const },
-    // Lines to alcoves
-    { pos: [0, 0.51, -12] as const, size: [0.03, 0.005, 3] as const },
-    { pos: [-3, 0.51, -12.5] as const, size: [6, 0.005, 0.03] as const },
-    { pos: [3, 0.51, -12.5] as const, size: [6, 0.005, 0.03] as const },
+    // Lateral lines to wings
+    { pos: [-5.0, 0.51, -13.5] as const, size: [4, 0.005, 0.03] as const },
+    { pos: [5.0, 0.51, -13.5] as const, size: [4, 0.005, 0.03] as const },
   ];
 
   return (
@@ -396,7 +481,7 @@ function FloorCircuits() {
           <meshStandardMaterial
             color={FORUM_PALETTE.circuitPrimary}
             emissive={FORUM_PALETTE.circuitPrimary}
-            emissiveIntensity={0.3}
+            emissiveIntensity={0.4}
             roughness={0.05}
             metalness={0.5}
           />
@@ -411,22 +496,8 @@ function FloorCircuits() {
 function ForumLighting() {
   return (
     <>
-      {/* Cool overhead light for the forum — technical feel */}
-      <pointLight
-        position={[0, 5, -9]}
-        intensity={1.5}
-        color="#B0C8E0"
-        distance={20}
-        decay={2}
-      />
-      {/* Warm accent on the System Table */}
-      <pointLight
-        position={[0, 3, -9]}
-        intensity={0.8}
-        color="#FFD4A0"
-        distance={8}
-        decay={2}
-      />
+      <pointLight position={[0, 5, -9]} intensity={1.5} color="#B0C8E0" distance={20} decay={2} />
+      <pointLight position={[0, 3, -9]} intensity={0.8} color="#FFD4A0" distance={8} decay={2} />
     </>
   );
 }

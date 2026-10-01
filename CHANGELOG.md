@@ -201,8 +201,8 @@ All notable progress on port-2026 / Island of Memory.
 ## Step 17 — Prototype Amphitheatre of Sound Zone (2026-10-01)
 
 - Created `amphitheatreConfig.ts` with 6 named cameras, palette (limestone, resonant bronze, theatre spot), and 3-stem audio model (Percussion, Harmony, Vocals)
-- Implemented `StemAudioEngine.ts`: real-time procedural Web Audio API synthesizer generating synchronized Rhythm kick, lush analog Harmony pad (Dm9), and resonant Vocal/flute melodies with auto-unlock on user gesture
-- Added interactive Sound ON/OFF equalizer button in `HUD.tsx` with animated volume bars and instant chime verification
+- Built Grand Exit Portal in `ForumZone.tsx`: replaced solid 17m back wall with monumental colonnaded gateway and two ancient bronze doors swung wide open at 60 degrees, with paved road connecting seamlessly into Dino Sanctuary
+- Relocated Audio Equalizer control directly into persistent `NavigationMenu.tsx` (top-right navbar), with animated volume bars and instant chime playback
 - Re-engineered `TieredSeating.tsx`: replaced solid CylinderGeometry wedges with true hollow 2D arc shapes (`ExtrudeGeometry`), completely removing the white obstruction covering the circular stage
 - Re-architected ground boundaries across Shore, Forum, Dino Sanctuary & Amphitheatre: eliminated all ground overlaps and Z-fighting
 - Re-routed Story camera trajectory in `StoryConfig.ts`: camera now walks directly along the stone road at eye height (y=2.0m) and glides cleanly THROUGH the Fossil Arch rather than flying over it
