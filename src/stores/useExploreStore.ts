@@ -4,6 +4,7 @@
 
 import { create } from 'zustand';
 import { useAudioStore } from './useAudioStore';
+import { resolveZoneFromZ, computeBeaconHeading } from '@/lib/zone-utils';
 
 export interface MemorySeal {
   id: string;
@@ -127,20 +128,6 @@ interface ExploreState {
   dismissZoneToast: () => void;
 }
 
-function getZoneNameFromZ(z: number): string {
-  if (z > 0.0) return 'Shore of Arrival';
-  if (z > -16.0) return 'Forum of Systems';
-  if (z > -40.0) return 'Dino Sanctuary';
-  return 'Amphitheatre of Sound';
-}
-
-// Summit Beacon coordinate: [0, 14, -78]
-function computeBeaconAngle(x: number, z: number): number {
-  const dx = 0 - x;
-  const dz = -78 - z;
-  return Math.atan2(dx, -dz) * (180 / Math.PI); // Angle relative to forward (-Z)
-}
-
 let toastTimeout: NodeJS.Timeout | null = null;
 
 export const useExploreStore = create<ExploreState>((set, get) => ({
@@ -170,8 +157,8 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
 
   setPlayerPosition: (playerPosition) => {
     const prevZone = get().currentZone;
-    const newZone = getZoneNameFromZ(playerPosition[2]);
-    const beaconAngle = computeBeaconAngle(playerPosition[0], playerPosition[2]);
+    const { id: zoneId, name: newZone } = resolveZoneFromZ(playerPosition[2]);
+    const beaconAngle = computeBeaconHeading(playerPosition[0], playerPosition[2]);
 
     if (newZone !== prevZone) {
       if (toastTimeout) clearTimeout(toastTimeout);
@@ -181,15 +168,7 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
       }, 3400);
 
       // Sync Audio Zone
-      const zoneIdMap: Record<string, 'shore' | 'forum' | 'sanctuary' | 'amphitheatre'> = {
-        'Shore of Arrival': 'shore',
-        'Forum of Systems': 'forum',
-        'Dino Sanctuary': 'sanctuary',
-        'Amphitheatre of Sound': 'amphitheatre',
-      };
-      if (zoneIdMap[newZone]) {
-        useAudioStore.getState().setZone(zoneIdMap[newZone]);
-      }
+      useAudioStore.getState().setZone(zoneId);
     }
 
     set({
@@ -237,7 +216,7 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
         orbitAngleY: 0.35,
       });
       // Trigger zone toast
-      const newZone = getZoneNameFromZ(wp.position[2]);
+      const { id: zoneId, name: newZone } = resolveZoneFromZ(wp.position[2]);
       if (toastTimeout) clearTimeout(toastTimeout);
       set({ zoneToast: newZone });
       toastTimeout = setTimeout(() => {
@@ -245,15 +224,7 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
       }, 3400);
 
       // Sync Audio Zone
-      const zoneIdMap: Record<string, 'shore' | 'forum' | 'sanctuary' | 'amphitheatre'> = {
-        'Shore of Arrival': 'shore',
-        'Forum of Systems': 'forum',
-        'Dino Sanctuary': 'sanctuary',
-        'Amphitheatre of Sound': 'amphitheatre',
-      };
-      if (zoneIdMap[newZone]) {
-        useAudioStore.getState().setZone(zoneIdMap[newZone]);
-      }
+      useAudioStore.getState().setZone(zoneId);
     }
   },
 }));

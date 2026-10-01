@@ -307,13 +307,25 @@ All notable progress on port-2026 / Island of Memory.
 
 ---
 
+## Step 24 — Architecture Refactor & Decoupling Pass (2026-10-01)
+
+- Cleaned up obsolete dead code: removed unused legacy `useScrollProgress.ts` (superseded by `useStoryScroll.ts`) and legacy modal `Overlay.tsx` (superseded by `CaseStudyPanel.tsx`)
+- Decoupled spatial boundary logic into pure testable utility `src/lib/zone-utils.ts` (`ZONE_BOUNDARIES`, `resolveZoneFromZ`, `computeBeaconHeading`), eliminating duplicated coordinate magic numbers across components
+- Refactored `useExploreStore.ts` and `ExplorePlayer.tsx` to consume centralized `zone-utils`, ensuring terrain elevation and audio transitions remain mathematically consistent
+- Enhanced test coverage: created Vitest unit suite `tests/unit/zone-utils.test.ts` verifying boundary continuity and compass angles (17/17 tests passing across 4 test suites)
+- Maintained 100% behavioral parity: verified seamless Story Mode scroll, Explore Mode kinematic navigation, audio crossfading, and Next.js static build (25/25 pages)
+- Verified build and dev server on port 3333
+
+---
+
 ## Current State Summary
 
 | Layer | Status |
 |-------|--------|
 | Design docs | 12 documents (including VISUAL-QA-AUDIT.md), all cross-referenced |
-| Codebase | 85+ source files, builds clean, 0 type errors |
-| Test suite | Vitest unit tests active & passing (14/14 across 3 test suites) |
+| Codebase | 84 clean, decoupled source files, builds clean, 0 type errors |
+| Test suite | Vitest unit tests active & passing (17/17 across 4 test suites) |
+| Architecture | Decoupled spatial boundaries (`zone-utils`), zero dead code, clean camera ownership |
 | Performance | Production-hardened: ZoneCuller unmounting, throttled CPU displacement, dynamic DPR [1.0..1.75], 60fps |
 | Mobile story | Active with bottom-docked frosted cards, full-screen case-study sheet, portrait camera compensation |
 | Zones live | Shore of Arrival + Forum of Systems + Dino Sanctuary + Amphitheatre of Sound rendered in scene |

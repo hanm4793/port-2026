@@ -17,6 +17,7 @@ import { useExploreStore, MEMORY_SEALS, type InteractPrompt } from '@/stores/use
 import { useExperienceStore } from '@/stores/useExperienceStore';
 import { useOverlayStore } from '@/stores/useOverlayStore';
 import { stemAudioEngine } from '@/experience/zones/amphitheatre/StemAudioEngine';
+import { resolveZoneFromZ } from '@/lib/zone-utils';
 
 const _moveDir = new THREE.Vector3();
 const _camForward = new THREE.Vector3();
@@ -170,14 +171,9 @@ export function ExplorePlayer() {
       const nextX = THREE.MathUtils.clamp(playerPos[0] + _moveDir.x * speed * delta, -14.5, 14.5);
       const nextZ = THREE.MathUtils.clamp(playerPos[2] + _moveDir.z * speed * delta, -65.0, 16.0);
 
-      // Compute natural terrain elevation
-      let groundY = 1.0;
-      if (nextZ > 2.0) groundY = 0.9; // Shore
-      else if (nextZ > -15.0) groundY = 1.2; // Forum
-      else if (nextZ > -38.0) groundY = 0.95; // Dino Sanctuary
-      else groundY = 1.35; // Amphitheatre
-
-      setPlayerPos([nextX, groundY, nextZ]);
+      // Compute natural terrain elevation via decoupled utility
+      const { groundElevation } = resolveZoneFromZ(nextZ);
+      setPlayerPos([nextX, groundElevation, nextZ]);
 
       // Rotate avatar towards movement direction
       const targetRotation = Math.atan2(_moveDir.x, _moveDir.z);
