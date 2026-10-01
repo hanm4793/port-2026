@@ -1,8 +1,9 @@
 'use client';
 
 // =============================================================================
-// CaseStudyPanel — contextual slide-in drawer for project & service details
-// Renders rich case-study data or service scope directly over the 3D scene.
+// CaseStudyPanel — contextual drawer for project & service details
+// Desktop: 480px slide-in panel on right side
+// Mobile: Full-screen bottom sheet with thumb-friendly close handle & full readability
 // =============================================================================
 
 import { useCallback, useEffect } from 'react';
@@ -62,26 +63,32 @@ export function CaseStudyPanel() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-40 bg-[#1A1816]/60 backdrop-blur-[3px]"
+            className="fixed inset-0 z-40 bg-[#141210]/75 backdrop-blur-[3px]"
             onClick={handleClose}
           />
 
-          {/* Slide-in panel */}
+          {/* Responsive Panel: Full-height bottom sheet on mobile, right drawer on desktop */}
           <motion.aside
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            initial={{ y: '100%', x: 0 }}
+            animate={{ y: 0, x: 0 }}
+            exit={{ y: '100%', x: 0 }}
             transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-            className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-lg
-                       bg-[#181614] border-l border-[#3A3632]/50
-                       overflow-y-auto shadow-2xl"
+            className="fixed inset-x-0 bottom-0 top-12 sm:top-0 sm:left-auto sm:right-0 sm:w-full sm:max-w-lg z-50
+                       bg-[#181614] border-t sm:border-t-0 sm:border-l border-[#3A3632]/60
+                       overflow-y-auto shadow-2xl rounded-t-2xl sm:rounded-none"
           >
-            {/* Close button */}
+            {/* Mobile Grab Bar */}
+            <div className="sm:hidden flex justify-center pt-3 pb-1">
+              <span className="w-12 h-1 bg-[#3A3632] rounded-full" />
+            </div>
+
+            {/* Close button with 44x44px touch target */}
             <button
+              type="button"
               onClick={handleClose}
-              className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center
+              className="absolute top-4 right-4 z-10 min-w-[44px] min-h-[44px] flex items-center justify-center
                          border border-[#3A3632]/50 bg-[#1E1B18] text-[#A89E8E] hover:text-[#F5F0E6]
-                         hover:border-[#C9A84C]/60 transition-colors text-lg"
+                         hover:border-[#C9A84C]/60 active:bg-[#C9A84C] active:text-[#1A1816] transition-colors text-lg cursor-pointer rounded-full sm:rounded-none"
               aria-label="Close Drawer"
             >
               &times;
@@ -116,10 +123,10 @@ function CaseStudyDetail({ project }: { project: Project }) {
   const cs = project.caseStudy;
 
   return (
-    <div className="p-6 md:p-8 pt-16 pb-24 space-y-8">
+    <div className="p-6 sm:p-8 pt-12 sm:pt-16 pb-24 space-y-6 sm:space-y-8">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex flex-wrap items-center gap-2 mb-2">
           <span className="text-[10px] tracking-[0.2em] uppercase text-[#C9A84C]">
             {project.category}
           </span>
@@ -137,7 +144,7 @@ function CaseStudyDetail({ project }: { project: Project }) {
           )}
         </div>
 
-        <h2 className="text-2xl md:text-3xl font-light tracking-tight text-[#F5F0E6] mb-3">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-light tracking-tight text-[#F5F0E6] mb-3">
           {project.title}
         </h2>
 
@@ -230,18 +237,18 @@ function CaseStudyDetail({ project }: { project: Project }) {
         </div>
       )}
 
-      {/* Action Footer */}
+      {/* Action Footer with 44px min touch buttons */}
       <div className="pt-6 border-t border-[#3A3632]/40 space-y-3">
         <Link
           href={`/contact?project=${project.slug}`}
-          className="block w-full py-3 text-center text-xs tracking-wider uppercase bg-[#C9A84C] text-[#1A1816] font-medium hover:bg-[#C9A84C]/80 transition-colors"
+          className="flex items-center justify-center min-h-[44px] w-full py-3 text-center text-xs tracking-wider uppercase bg-[#C9A84C] text-[#1A1816] font-medium hover:bg-[#C9A84C]/80 active:scale-95 transition-all"
         >
           Discuss Similar System
         </Link>
 
         <Link
           href={`/projects/${project.slug}`}
-          className="block w-full py-2.5 text-center text-xs tracking-wider uppercase border border-[#3A3632] text-[#A89E8E] hover:text-[#F5F0E6] hover:border-[#8A7E6E] transition-colors"
+          className="flex items-center justify-center min-h-[44px] w-full py-2.5 text-center text-xs tracking-wider uppercase border border-[#3A3632] text-[#A89E8E] hover:text-[#F5F0E6] hover:border-[#8A7E6E] active:scale-95 transition-all"
         >
           Full Case Study Page &rarr;
         </Link>
@@ -254,7 +261,7 @@ function CaseStudyDetail({ project }: { project: Project }) {
 
 function ServiceDetail({ service }: { service: Service }) {
   return (
-    <div className="p-6 md:p-8 pt-16 pb-24 space-y-8">
+    <div className="p-6 sm:p-8 pt-12 sm:pt-16 pb-24 space-y-6 sm:space-y-8">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
@@ -267,7 +274,7 @@ function ServiceDetail({ service }: { service: Service }) {
           </span>
         </div>
 
-        <h2 className="text-2xl md:text-3xl font-light tracking-tight text-[#F5F0E6] mb-3">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-light tracking-tight text-[#F5F0E6] mb-3">
           {service.title}
         </h2>
 
@@ -328,14 +335,14 @@ function ServiceDetail({ service }: { service: Service }) {
       <div className="pt-6 border-t border-[#3A3632]/40 space-y-3">
         <Link
           href={`/contact?service=${service.slug}`}
-          className="block w-full py-3 text-center text-xs tracking-wider uppercase bg-[#C9A84C] text-[#1A1816] font-medium hover:bg-[#C9A84C]/80 transition-colors"
+          className="flex items-center justify-center min-h-[44px] w-full py-3 text-center text-xs tracking-wider uppercase bg-[#C9A84C] text-[#1A1816] font-medium hover:bg-[#C9A84C]/80 active:scale-95 transition-all"
         >
           Scope {service.shortTitle} Project
         </Link>
 
         <Link
           href={`/services/${service.slug}`}
-          className="block w-full py-2.5 text-center text-xs tracking-wider uppercase border border-[#3A3632] text-[#A89E8E] hover:text-[#F5F0E6] hover:border-[#8A7E6E] transition-colors"
+          className="flex items-center justify-center min-h-[44px] w-full py-2.5 text-center text-xs tracking-wider uppercase border border-[#3A3632] text-[#A89E8E] hover:text-[#F5F0E6] hover:border-[#8A7E6E] active:scale-95 transition-all"
         >
           Full Service Page &rarr;
         </Link>

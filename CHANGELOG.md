@@ -285,19 +285,30 @@ All notable progress on port-2026 / Island of Memory.
 
 ---
 
+## Step 22 — Mobile-First Story Adaptation (2026-10-01)
+
+- Created `MOBILE-ADAPTATION.md`: comprehensive mobile architecture specification defining story-first invariants, portrait aspect ratio compensation, touch affordance rules (44px min targets), and battery thermal safety
+- Re-architected `CaseStudyPanel.tsx`: transformed from desktop 480px slide-in panel into full-screen responsive bottom sheet with top grab-bar, generous reading typography, and accessible 44×44px circular close handle
+- Re-engineered `StoryChapters.tsx`: implemented full-width frosted glass cards (`bg-[#161412]/88`, `backdrop-blur-md`, `border-[#3A3632]/50`) docked comfortably to the bottom half of mobile screens
+- Implemented portrait aspect ratio compensation in `StoryCameraRail.tsx`: detects vertical viewports (`width < height`), widens FOV by +10° (up to 68°), and raises camera elevation (+0.6m Y) so monuments remain framed in the upper 45% while text cards occupy the bottom half
+- Created Vitest unit test suite `tests/unit/mobile-adaptation.test.ts` verifying mobile DPR capping, 6-chapter scroll progression, and camera interpolation boundaries (14/14 tests passing across 3 suites)
+- Verified build and dev server on port 3333
+
+---
+
 ## Current State Summary
 
 | Layer | Status |
 |-------|--------|
-| Design docs | 10 documents (including PERFORMANCE.md), all cross-referenced |
-| Codebase | 82+ source files, builds clean, 0 type errors |
-| Test suite | Vitest unit tests active & passing (11/11 across 2 test suites) |
+| Design docs | 11 documents (including MOBILE-ADAPTATION.md), all cross-referenced |
+| Codebase | 85+ source files, builds clean, 0 type errors |
+| Test suite | Vitest unit tests active & passing (14/14 across 3 test suites) |
 | Performance | Production-hardened: ZoneCuller unmounting, throttled CPU displacement, dynamic DPR [1.0..1.75], 60fps |
+| Mobile story | Active with bottom-docked frosted cards, full-screen case-study sheet, portrait camera compensation |
 | Zones live | Shore of Arrival + Forum of Systems + Dino Sanctuary + Amphitheatre of Sound rendered in scene |
 | Audio system | Active with procedural zone soundscapes, opt-in entry modal, auto-ducking & tab-focus dimming |
 | Story Mode | Active with GSAP + Lenis, 6 chapters, beat-driven camera rail & audio zone transitions |
 | Explore Mode | Active with museum-grade reticle, compass wayfinding, zone toasts, 4 Memory Seals & tactile audio ticks |
-| Overlays & Panels | Contextual right-side drawer (`CaseStudyPanel`) docked to 3D with audio ducking |
+| Overlays & Panels | Contextual right-side drawer / mobile bottom sheet (`CaseStudyPanel`) docked to 3D with audio ducking |
 | Routes | `/`, `/services`, `/services/[slug]`, `/projects`, `/projects/[slug]`, `/about`, `/contact`, `/api/contact` |
 | Remaining zones | Agora, Atelier (proxy exists), Temple, Beacon |
-| Mobile experience | Responsive DOM shell ready, mobile touch D-Pad active in Explore Mode |

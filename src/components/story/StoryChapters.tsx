@@ -2,6 +2,8 @@
 
 // =============================================================================
 // StoryChapters — semantic HTML sections synced to story beats
+// Mobile-adapted with full-width frosted glass bottom docking,
+// high-contrast typography, and thumb-friendly touch targets.
 // =============================================================================
 
 import { STORY_CHAPTERS, CHAPTER_SCROLL_HEIGHT, interpolateBeats } from '@/experience/story/StoryConfig';
@@ -32,7 +34,7 @@ export function StoryChapters({ scrollState }: StoryChaptersProps) {
             style={{ height: `${CHAPTER_SCROLL_HEIGHT}vh` }}
             aria-label={chapter.title}
           >
-            <div className="sticky top-0 h-screen flex items-end justify-start pb-24 px-8 md:px-16">
+            <div className="sticky top-0 h-screen flex items-end justify-start pb-16 sm:pb-24 px-4 sm:px-8 md:px-16 pointer-events-none">
               {chapter.beats.map((beat, bi) => (
                 <BeatCard
                   key={bi}
@@ -70,7 +72,6 @@ function BeatCard({ beat, isVisible, localProgress, beatAt, nextBeatAt }: BeatCa
 
   let opacity = 0;
   if (isVisible) {
-    // Fade in first 20%, full middle, fade out last 15%
     if (beatLocalProgress < 0.15) opacity = beatLocalProgress / 0.15;
     else if (beatLocalProgress < 0.75) opacity = 1;
     else opacity = Math.max(0, 1 - (beatLocalProgress - 0.75) / 0.25);
@@ -78,45 +79,46 @@ function BeatCard({ beat, isVisible, localProgress, beatAt, nextBeatAt }: BeatCa
 
   return (
     <div
-      className="absolute bottom-24 left-8 md:left-16 max-w-md transition-transform duration-500"
+      className="absolute bottom-16 sm:bottom-24 left-4 right-4 sm:right-auto sm:left-8 md:left-16 sm:max-w-md transition-all duration-500"
       style={{
         opacity,
-        transform: `translateY(${isVisible ? 0 : 15}px)`,
+        transform: `translateY(${isVisible ? 0 : 16}px)`,
         pointerEvents: opacity > 0.5 ? 'auto' : 'none',
       }}
     >
-      {/* Beat label */}
-      {beat.label && (
-        <span className="text-[10px] tracking-[0.3em] uppercase text-[#C9A84C] mb-2 block">
-          {beat.label}
-        </span>
-      )}
+      {/* Mobile-optimized frosted card panel */}
+      <div className="p-5 sm:p-0 bg-[#161412]/88 sm:bg-transparent backdrop-blur-md sm:backdrop-blur-none border border-[#3A3632]/50 sm:border-0 rounded-lg sm:rounded-none shadow-2xl sm:shadow-none">
+        {/* Beat label */}
+        {beat.label && (
+          <span className="text-[10px] tracking-[0.25em] uppercase text-[#C9A84C] mb-1.5 block font-mono">
+            {beat.label}
+          </span>
+        )}
 
-      {/* Heading */}
-      {beat.heading && (
-        <h2 className="text-xl md:text-3xl font-light tracking-tight mb-3 text-[#F5F0E6] drop-shadow-lg">
-          {beat.heading}
-        </h2>
-      )}
+        {/* Heading */}
+        {beat.heading && (
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-light tracking-tight mb-2 sm:mb-3 text-[#F5F0E6] drop-shadow-lg">
+            {beat.heading}
+          </h2>
+        )}
 
-      {/* Body */}
-      {beat.body && (
-        <p className="text-sm md:text-base text-[#B8AEA0] leading-relaxed mb-4 drop-shadow-md max-w-sm">
-          {beat.body}
-        </p>
-      )}
+        {/* Body */}
+        {beat.body && (
+          <p className="text-xs sm:text-sm md:text-base text-[#C4B9AA] sm:text-[#B8AEA0] leading-relaxed mb-4 drop-shadow-md">
+            {beat.body}
+          </p>
+        )}
 
-      {/* CTA */}
-      {beat.cta && (
-        <a
-          href={beat.cta.href}
-          className="inline-block px-5 py-2 text-xs tracking-wider uppercase
-                     bg-[#C9A84C] text-[#1A1816] hover:bg-[#C9A84C]/80
-                     transition-colors"
-        >
-          {beat.cta.text}
-        </a>
-      )}
+        {/* CTA */}
+        {beat.cta && (
+          <a
+            href={beat.cta.href}
+            className="inline-flex items-center justify-center min-h-[44px] px-6 py-2.5 text-xs tracking-wider uppercase font-medium bg-[#C9A84C] text-[#1A1816] hover:bg-[#C9A84C]/90 active:scale-95 transition-all shadow-lg"
+          >
+            {beat.cta.text} &rarr;
+          </a>
+        )}
+      </div>
     </div>
   );
 }
