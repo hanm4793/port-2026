@@ -201,14 +201,14 @@ All notable progress on port-2026 / Island of Memory.
 ## Step 17 — Prototype Amphitheatre of Sound Zone (2026-10-01)
 
 - Created `amphitheatreConfig.ts` with 6 named cameras, palette (limestone, resonant bronze, theatre spot), and 3-stem audio model (Percussion, Harmony, Vocals)
-- Implemented `AcousticStage.tsx`: circular marble orchestra with 3 concentric sound-reactive pulsing rings, central bronze lyre/relic, and 3 interactive stem steles (Percussion, Harmony, Lead Vocals)
-- Implemented `TieredSeating.tsx`: 5 semicircular Greek limestone tiers climbing the natural slope, with radial access stairways (klimakes) and top-tier acoustic steles
-- Implemented `EchoWall.tsx`: curved Skene wall with sound wave relief carvings and 3 suspended architectural linen acoustic reflector sails
+- Implemented `StemAudioEngine.ts`: real-time procedural Web Audio API synthesizer generating synchronized Rhythm kick, lush analog Harmony pad (Dm9), and resonant Vocal/flute melodies with 0 external files
+- Implemented `AcousticStage.tsx`: enlarged circular marble orchestra (diameter 9.6m) with 3 concentric sound-reactive pulsing rings, monumental 2.8m bronze lyre with 5 vibrating strings, and 3 front-facing unobstructed stem steles
+- Implemented `TieredSeating.tsx`: 5 spacious semicircular Greek limestone tiers embracing the stage from behind with 4m ambulatory diazoma buffer, radial stairways (klimakes), and top-tier acoustic monoliths
+- Implemented `EchoWall.tsx`: monumental curved Skene back wall (26m wide) with wave reliefs and 3 suspended architectural linen acoustic sails (width 7m)
 - Implemented `StageLighting.tsx`: dramatic theatrical key spotlight cutting down to the orchestra with soft penumbra, stage footlights, and twilight horizon fill
-- Assembled `AmphitheatreZone.tsx` with hillside base terrain and flanking coastal ridge rocks
-- Mounted `AmphitheatreZone` in `Experience.tsx` and moved `BeaconSilhouette` in `ShoreZone` further back to `z = -78` for authentic spatial depth
-- Synchronized Chapter 5 ("Art & Music") in `StoryConfig.ts` with 3 cinematic beats (Ridge Entrance, Stage Close-Up, Theatron Overview)
-- Updated `manifest.json` with 3 new amphitheatre assets
+- Resolved spatial bottlenecks in `DinoSanctuaryZone.tsx`: opened 12m wide mountain gorge pass and added continuous weathered stone trail connecting Dino Sanctuary to Amphitheatre
+- Synchronized Chapter 4 & 5 in `StoryConfig.ts` for continuous cinematic trail flight without clipping through rocks
+- Updated `manifest.json` with new amphitheatre assets
 - Verified build and dev server on port 3333
 
 ---

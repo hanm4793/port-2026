@@ -2,18 +2,20 @@
 
 // =============================================================================
 // Acoustic Stage — circular performance orchestra with sound-reactive rings
-// Features 3 interactive stem nodes (Percussion, Harmony, Vocals) and
-// a central resonant bronze lyre pedestal that docks into the music case study.
+// Features:
+// 1. Monumental 2.8m Resonant Bronze Lyre with vibrating acoustic strings
+// 2. 3 prominent, unobstructed Stem Steles positioned along the front arc
+// 3. Real procedural Web Audio API sound engine (Rhythm, Harmony, Vocals)
 // =============================================================================
 
 import { useRef, useState, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { AMPHITHEATRE_PALETTE, AUDIO_STEMS, type AudioStemId } from './amphitheatreConfig';
+import { stemAudioEngine } from './StemAudioEngine';
 import { InteractiveObject } from '@/experience/interaction/InteractiveObject';
 
 export function AcousticStage() {
-  // Stem active states (default: all 3 stems playing together)
   const [activeStems, setActiveStems] = useState<Record<AudioStemId, boolean>>({
     rhythm: true,
     harmony: true,
@@ -22,13 +24,15 @@ export function AcousticStage() {
 
   const ringsRef = useRef<THREE.Group>(null);
   const lyreRef = useRef<THREE.Group>(null);
+  const stringsRef = useRef<THREE.Group>(null);
 
   const toggleStem = useCallback((id: AudioStemId) => {
-    setActiveStems((prev) => {
-      const next = { ...prev, [id]: !prev[id] };
-      console.log(`[Amphitheatre] Stem ${id} toggled:`, next[id]);
-      return next;
-    });
+    const isNowActive = stemAudioEngine.toggleStem(id);
+    setActiveStems((prev) => ({ ...prev, [id]: isNowActive }));
+  }, []);
+
+  const handleLyreClick = useCallback(() => {
+    stemAudioEngine.playLyreChime();
   }, []);
 
   // Sound-reactive animation: concentric rings expand and pulse on the stage
@@ -45,29 +49,36 @@ export function AcousticStage() {
 
           const mat = child.material as THREE.MeshStandardMaterial;
           if (isActive) {
-            const pulse = 0.5 + Math.sin(t * speed * 3.0 + i * 1.5) * 0.45;
-            mat.emissiveIntensity = pulse;
-            mat.opacity = 0.4 + pulse * 0.45;
+            const pulse = 0.5 + Math.sin(t * speed * 3.2 + i * 1.6) * 0.45;
+            mat.emissiveIntensity = pulse * 1.2;
+            mat.opacity = 0.45 + pulse * 0.45;
           } else {
-            mat.emissiveIntensity = 0.08;
-            mat.opacity = 0.15;
+            mat.emissiveIntensity = 0.05;
+            mat.opacity = 0.12;
           }
         }
       });
     }
 
-    // Gentle float on central bronze lyre/relic
+    // Gentle float & string vibration on the central lyre monument
     if (lyreRef.current) {
-      lyreRef.current.position.y = 1.35 + Math.sin(t * 1.2) * 0.04;
-      lyreRef.current.rotation.y = t * 0.25;
+      lyreRef.current.position.y = 1.9 + Math.sin(t * 1.4) * 0.05;
+    }
+
+    if (stringsRef.current && activeStems.vocals) {
+      stringsRef.current.children.forEach((str, idx) => {
+        if (str instanceof THREE.Mesh) {
+          str.scale.x = 1.0 + Math.sin(t * 14.0 + idx * 2.0) * 0.25;
+        }
+      });
     }
   });
 
   return (
     <group position={[-3, 0.4, -46]}>
-      {/* ── Outer Foundation Rim ────────────────────────────────────────── */}
-      <mesh position={[0, 0.06, 0]} receiveShadow>
-        <cylinderGeometry args={[4.2, 4.4, 0.2, 32]} />
+      {/* ── Foundation Basalt Rim ────────────────────────────────────────── */}
+      <mesh position={[0, 0.08, 0]} receiveShadow>
+        <cylinderGeometry args={[5.2, 5.5, 0.25, 36]} />
         <meshStandardMaterial
           color={AMPHITHEATRE_PALETTE.darkBasalt}
           roughness={0.85}
@@ -75,9 +86,9 @@ export function AcousticStage() {
         />
       </mesh>
 
-      {/* ── Polished Marble Orchestra Stage ─────────────────────────────── */}
-      <mesh position={[0, 0.18, 0]} receiveShadow>
-        <cylinderGeometry args={[3.8, 4.0, 0.12, 32]} />
+      {/* ── Polished Marble Orchestra Stage (Radius 4.8m) ───────────────── */}
+      <mesh position={[0, 0.24, 0]} receiveShadow>
+        <cylinderGeometry args={[4.8, 5.0, 0.18, 36]} />
         <meshStandardMaterial
           color={AMPHITHEATRE_PALETTE.stageMarble}
           roughness={0.25}
@@ -86,14 +97,14 @@ export function AcousticStage() {
       </mesh>
 
       {/* ── Concentric Sound-Reactive Stage Rings ───────────────────────── */}
-      <group ref={ringsRef} position={[0, 0.25, 0]}>
+      <group ref={ringsRef} position={[0, 0.34, 0]}>
         {/* Outer Ring: Rhythm / Percussion */}
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[3.1, 3.25, 48]} />
+          <ringGeometry args={[3.8, 4.05, 48]} />
           <meshStandardMaterial
             color={AUDIO_STEMS[0].color}
             emissive={AUDIO_STEMS[0].color}
-            emissiveIntensity={0.6}
+            emissiveIntensity={0.8}
             transparent
             opacity={0.7}
             side={THREE.DoubleSide}
@@ -102,11 +113,11 @@ export function AcousticStage() {
 
         {/* Middle Ring: Harmony / Synths */}
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[2.0, 2.12, 40]} />
+          <ringGeometry args={[2.5, 2.7, 40]} />
           <meshStandardMaterial
             color={AUDIO_STEMS[1].color}
             emissive={AUDIO_STEMS[1].color}
-            emissiveIntensity={0.7}
+            emissiveIntensity={0.9}
             transparent
             opacity={0.75}
             side={THREE.DoubleSide}
@@ -115,11 +126,11 @@ export function AcousticStage() {
 
         {/* Inner Ring: Lead Vocals */}
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.95, 1.05, 32]} />
+          <ringGeometry args={[1.2, 1.35, 32]} />
           <meshStandardMaterial
             color={AUDIO_STEMS[2].color}
             emissive={AUDIO_STEMS[2].color}
-            emissiveIntensity={0.9}
+            emissiveIntensity={1.1}
             transparent
             opacity={0.85}
             side={THREE.DoubleSide}
@@ -127,91 +138,124 @@ export function AcousticStage() {
         </mesh>
       </group>
 
-      {/* ── Center Thymele (Altar Pedestal) & Resonant Lyre ─────────────── */}
-      <mesh position={[0, 0.65, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.45, 0.55, 0.8, 12]} />
-        <meshStandardMaterial
-          color={AMPHITHEATRE_PALETTE.darkBasalt}
-          roughness={0.7}
-          metalness={0.2}
-        />
-      </mesh>
+      {/* ── Central Resonant Bronze Lyre Monument (Height ~2.8m) ─────────── */}
+      <group position={[0, 0, 0]}>
+        {/* Hexagonal Stone Pedestal */}
+        <mesh position={[0, 0.7, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[0.7, 0.85, 0.9, 6]} />
+          <meshStandardMaterial
+            color={AMPHITHEATRE_PALETTE.darkBasalt}
+            roughness={0.65}
+            metalness={0.2}
+          />
+        </mesh>
 
-      {/* Interactive Core: Central Acoustic Relic / Lyre */}
-      <InteractiveObject
-        config={{
-          id: 'amphitheatre-central-lyre',
-          zone: 'amphitheatre',
-          overlayId: 'service',
-          overlayData: { service: 'music-sonic-identity', slug: 'music-sonic-identity' },
-        }}
-      >
-        <group ref={lyreRef} position={[0, 1.35, 0]}>
-          {/* Outer Lyre Horns */}
-          <mesh position={[-0.22, 0, 0]} rotation={[0, 0, -0.2]} castShadow>
-            <cylinderGeometry args={[0.035, 0.05, 0.65, 8]} />
-            <meshStandardMaterial
-              color={AMPHITHEATRE_PALETTE.resonantBronze}
-              roughness={0.2}
-              metalness={0.85}
-            />
-          </mesh>
-          <mesh position={[0.22, 0, 0]} rotation={[0, 0, 0.2]} castShadow>
-            <cylinderGeometry args={[0.035, 0.05, 0.65, 8]} />
-            <meshStandardMaterial
-              color={AMPHITHEATRE_PALETTE.resonantBronze}
-              roughness={0.2}
-              metalness={0.85}
-            />
-          </mesh>
+        {/* Interactive Lyre Core */}
+        <InteractiveObject
+          config={{
+            id: 'amphitheatre-central-lyre',
+            zone: 'amphitheatre',
+            overlayId: 'service',
+            overlayData: { service: 'music-sonic-identity', slug: 'music-sonic-identity' },
+          }}
+        >
+          <group ref={lyreRef} position={[0, 1.9, 0]} onClick={handleLyreClick}>
+            {/* Monumental Curved Bronze Horns */}
+            <mesh position={[-0.45, 0.25, 0]} rotation={[0, 0, -0.22]} castShadow>
+              <cylinderGeometry args={[0.07, 0.11, 1.6, 10]} />
+              <meshStandardMaterial
+                color={AMPHITHEATRE_PALETTE.resonantBronze}
+                roughness={0.22}
+                metalness={0.85}
+              />
+            </mesh>
+            <mesh position={[0.45, 0.25, 0]} rotation={[0, 0, 0.22]} castShadow>
+              <cylinderGeometry args={[0.07, 0.11, 1.6, 10]} />
+              <meshStandardMaterial
+                color={AMPHITHEATRE_PALETTE.resonantBronze}
+                roughness={0.22}
+                metalness={0.85}
+              />
+            </mesh>
 
-          {/* Crossbar */}
-          <mesh position={[0, 0.26, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
-            <cylinderGeometry args={[0.025, 0.025, 0.48, 8]} />
-            <meshStandardMaterial
-              color={AMPHITHEATRE_PALETTE.resonantBronze}
-              roughness={0.2}
-              metalness={0.85}
-            />
-          </mesh>
+            {/* Bronze Top Crossbar */}
+            <mesh position={[0, 0.95, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+              <cylinderGeometry args={[0.055, 0.055, 1.1, 10]} />
+              <meshStandardMaterial
+                color={AMPHITHEATRE_PALETTE.resonantBronze}
+                roughness={0.22}
+                metalness={0.85}
+              />
+            </mesh>
 
-          {/* Floating Sound Core (Octahedron) */}
-          <mesh position={[0, 0.05, 0]} castShadow>
-            <octahedronGeometry args={[0.18]} />
-            <meshStandardMaterial
-              color={AUDIO_STEMS[2].color}
-              emissive={AUDIO_STEMS[2].color}
-              emissiveIntensity={activeStems.vocals ? 1.4 : 0.2}
-              roughness={0.15}
-              metalness={0.4}
-              transparent
-              opacity={0.9}
-            />
-          </mesh>
-        </group>
-      </InteractiveObject>
+            {/* Lower Soundboard Arch */}
+            <mesh position={[0, -0.4, 0]} castShadow>
+              <boxGeometry args={[0.75, 0.25, 0.28]} />
+              <meshStandardMaterial
+                color={AMPHITHEATRE_PALETTE.resonantBronze}
+                roughness={0.28}
+                metalness={0.8}
+              />
+            </mesh>
 
-      {/* ── 3 Interactive Stem Steles along Stage Arc ────────────────────── */}
+            {/* 5 Vibrating Luminous Acoustic Strings */}
+            <group ref={stringsRef}>
+              {[-0.28, -0.14, 0, 0.14, 0.28].map((sx, idx) => (
+                <mesh key={idx} position={[sx, 0.28, 0]}>
+                  <cylinderGeometry args={[0.012, 0.012, 1.35, 6]} />
+                  <meshStandardMaterial
+                    color="#F5F0E6"
+                    emissive={AUDIO_STEMS[2].color}
+                    emissiveIntensity={activeStems.vocals ? 1.5 : 0.2}
+                    roughness={0.1}
+                  />
+                </mesh>
+              ))}
+            </group>
+
+            {/* Central Amber Resonator Core */}
+            <mesh position={[0, 0.28, 0]} castShadow>
+              <octahedronGeometry args={[0.3]} />
+              <meshStandardMaterial
+                color={AUDIO_STEMS[2].color}
+                emissive={AUDIO_STEMS[2].color}
+                emissiveIntensity={activeStems.vocals ? 1.8 : 0.3}
+                roughness={0.15}
+                metalness={0.4}
+                transparent
+                opacity={0.92}
+              />
+            </mesh>
+          </group>
+        </InteractiveObject>
+      </group>
+
+      {/* ── 3 Front-Facing Unobstructed Stem Steles ──────────────────────── */}
+      {/* 1. Left Stele: Rhythm & Percussion (Terracotta) */}
       <StemStele
         stem={AUDIO_STEMS[0]}
-        position={[-2.6, 0.25, 0.4]}
-        rotationY={0.6}
+        position={[-3.8, 0.3, 1.2]}
+        rotationY={0.45}
         isActive={activeStems.rhythm}
         onToggle={() => toggleStem('rhythm')}
       />
-      <StemStele
-        stem={AUDIO_STEMS[1]}
-        position={[2.6, 0.25, 0.4]}
-        rotationY={-0.6}
-        isActive={activeStems.harmony}
-        onToggle={() => toggleStem('harmony')}
-      />
+
+      {/* 2. Center-Front Stele: Vocals & Acoustic (Gold) */}
       <StemStele
         stem={AUDIO_STEMS[2]}
-        position={[0, 0.25, -2.8]}
-        rotationY={Math.PI}
+        position={[0.0, 0.3, 4.0]}
+        rotationY={0.0}
         isActive={activeStems.vocals}
         onToggle={() => toggleStem('vocals')}
+      />
+
+      {/* 3. Right Stele: Harmony & Strings (Cyan Blue) */}
+      <StemStele
+        stem={AUDIO_STEMS[1]}
+        position={[3.8, 0.3, 1.2]}
+        rotationY={-0.45}
+        isActive={activeStems.harmony}
+        onToggle={() => toggleStem('harmony')}
       />
     </group>
   );
@@ -228,7 +272,6 @@ interface StemSteleProps {
 }
 
 function StemStele({ stem, position, rotationY, isActive, onToggle }: StemSteleProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -249,46 +292,46 @@ function StemStele({ stem, position, rotationY, isActive, onToggle }: StemSteleP
         document.body.style.cursor = 'default';
       }}
     >
-      {/* Stone Pillar Body */}
-      <mesh position={[0, 0.55, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.3, 1.1, 0.2]} />
+      {/* Stone Pillar Body (Height 1.4m) */}
+      <mesh position={[0, 0.7, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.42, 1.4, 0.28]} />
         <meshStandardMaterial
-          color={isActive ? '#36312C' : '#221F1D'}
+          color={isActive ? '#38322D' : '#1E1B19'}
           roughness={0.7}
           metalness={0.1}
         />
       </mesh>
 
-      {/* Bronze Resonance Plate */}
-      <mesh position={[0, 0.55, 0.11]} castShadow>
-        <boxGeometry args={[0.22, 0.85, 0.02]} />
+      {/* Front Resonant Bronze Plate */}
+      <mesh position={[0, 0.7, 0.15]} castShadow>
+        <boxGeometry args={[0.32, 1.15, 0.03]} />
         <meshStandardMaterial
           color={AMPHITHEATRE_PALETTE.resonantBronze}
-          roughness={0.3}
+          roughness={0.28}
           metalness={0.8}
         />
       </mesh>
 
-      {/* Waveform Glyph Indicator */}
-      <mesh ref={meshRef} position={[0, 0.95, 0.13]}>
-        <boxGeometry args={[0.16, 0.08, 0.02]} />
+      {/* Soundwave Glyph Indicator */}
+      <mesh position={[0, 1.15, 0.18]}>
+        <boxGeometry args={[0.22, 0.12, 0.03]} />
         <meshStandardMaterial
           color={stem.color}
           emissive={stem.color}
-          emissiveIntensity={isActive ? (hovered ? 1.6 : 1.1) : 0.15}
+          emissiveIntensity={isActive ? (hovered ? 2.0 : 1.4) : 0.15}
           roughness={0.1}
         />
       </mesh>
 
-      {/* Status Ring at Base */}
+      {/* Luminous Base Status Ring */}
       <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.28, 0.36, 16]} />
+        <ringGeometry args={[0.35, 0.46, 20]} />
         <meshStandardMaterial
           color={stem.color}
           emissive={stem.color}
-          emissiveIntensity={isActive ? 0.6 : 0.05}
+          emissiveIntensity={isActive ? 0.9 : 0.05}
           transparent
-          opacity={isActive ? 0.8 : 0.2}
+          opacity={isActive ? 0.9 : 0.2}
           side={THREE.DoubleSide}
         />
       </mesh>

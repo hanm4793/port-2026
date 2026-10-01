@@ -80,7 +80,7 @@ function SanctuaryFloor() {
   );
 }
 
-// ─── Canyon Cliffs ──────────────────────────────────────────────────────────
+// ─── Canyon Cliffs & Open Mountain Gorge ────────────────────────────────────
 
 function CanyonCliffs() {
   const cliffSegments = useMemo(() => {
@@ -93,10 +93,11 @@ function CanyonCliffs() {
       { x: 12.5, z: -22, h: 7.5, rx: -0.1, rz: -0.1 },
       { x: 13.8, z: -28, h: 9.5, rx: 0.1, rz: -0.14 },
       { x: 13.0, z: -35, h: 8, rx: -0.05, rz: -0.12 },
-      // Back cliff ridge
-      { x: -6, z: -40, h: 9.5, rx: 0.15, rz: 0.0 },
-      { x: 6, z: -40, h: 9.5, rx: 0.15, rz: 0.0 },
-      { x: 0, z: -42, h: 11, rx: 0.1, rz: 0.0 },
+      // Natural Mountain Gorge Pillars (opening an unobstructed 12m wide portal towards Amphitheatre)
+      { x: -9.5, z: -38, h: 9.0, rx: 0.15, rz: 0.08 },
+      { x: 8.5, z: -38, h: 9.0, rx: 0.12, rz: -0.08 },
+      { x: -11.0, z: -43, h: 8.0, rx: 0.05, rz: 0.1 },
+      { x: 10.0, z: -43, h: 8.0, rx: 0.05, rz: -0.1 },
     ];
   }, []);
 
@@ -117,6 +118,55 @@ function CanyonCliffs() {
             metalness={0.05}
           />
         </mesh>
+      ))}
+
+      {/* Weathered Stone Trail leading through the gorge into Amphitheatre */}
+      <ConnectingTrail />
+    </group>
+  );
+}
+
+// ─── Weathered Stone Trail into Amphitheatre ─────────────────────────────────
+
+function ConnectingTrail() {
+  const trailSegments = useMemo(() => {
+    return [
+      { x: 0.0, z: -33, w: 3.2, len: 4.0 },
+      { x: -1.2, z: -37, w: 3.0, len: 4.5 },
+      { x: -2.4, z: -41.5, w: 3.4, len: 5.0 },
+    ];
+  }, []);
+
+  return (
+    <group>
+      {trailSegments.map((seg, i) => (
+        <mesh
+          key={i}
+          position={[seg.x, 0.18, seg.z]}
+          rotation={[-Math.PI / 2, 0, -0.12]}
+          receiveShadow
+        >
+          <planeGeometry args={[seg.w, seg.len]} />
+          <meshStandardMaterial
+            color="#8A7E6E"
+            roughness={0.85}
+            metalness={0.05}
+          />
+        </mesh>
+      ))}
+
+      {/* Trail Marker Cairn Stones */}
+      {[-3.2, 0.8].map((x, idx) => (
+        <group key={idx} position={[x, 0.3, -37.5]}>
+          <mesh position={[0, 0.2, 0]} castShadow>
+            <dodecahedronGeometry args={[0.35, 0]} />
+            <meshStandardMaterial color="#3A3430" roughness={0.9} />
+          </mesh>
+          <mesh position={[0, 0.55, 0]} castShadow>
+            <dodecahedronGeometry args={[0.22, 0]} />
+            <meshStandardMaterial color="#BFA276" roughness={0.7} />
+          </mesh>
+        </group>
       ))}
     </group>
   );

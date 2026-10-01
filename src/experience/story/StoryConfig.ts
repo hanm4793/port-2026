@@ -209,12 +209,12 @@ export const STORY_CHAPTERS: StoryChapter[] = [
         cta: { text: 'View Film Chronicle', href: '/projects/dinosaur-universe-chronicles' },
       },
       {
-        // Beat 3: Wide vista across the glowing sanctuary basin
+        // Beat 3: Gliding through the open canyon gorge along the stone trail
         at: 0.8,
         camera: {
-          position: [-3.5, 3.8, -25],
-          target: [1.0, 1.8, -31],
-          fov: 52,
+          position: [-1.2, 3.8, -34],
+          target: [-2.5, 2.0, -44],
+          fov: 50,
         },
         heading: 'Crafted Imagination',
         body: 'Every creature silhouette, lighting key, and narrative arc is authored with intent.',
@@ -231,36 +231,36 @@ export const STORY_CHAPTERS: StoryChapter[] = [
     preloadZone: 'beacon',
     beats: [
       {
-        // Beat 1: Cresting the ridge, viewing the amphitheatre below
+        // Beat 1: Emerging from the gorge onto the mountain trail overlooking Amphitheatre
         at: 0.0,
         camera: {
-          position: [-3, 6.5, -38],
-          target: [-3, 1.2, -48],
-          fov: 52,
+          position: [-2.4, 4.2, -37],
+          target: [-3.0, 1.8, -46],
+          fov: 50,
         },
         label: '05',
         heading: 'Resonances in Stone',
         body: 'Music is the invisible architecture of emotion. Merging classical composition, analog synthesis, and live vocal performance.',
       },
       {
-        // Beat 2: Stage close-up with sound-reactive concentric rings & stem steles
-        at: 0.35,
+        // Beat 2: Gliding right to the stage front — unobstructed view of 3 steles & lyre
+        at: 0.4,
         camera: {
-          position: [-3, 2.2, -42.5],
-          target: [-3, 1.6, -47],
+          position: [-3.0, 2.4, -40.5],
+          target: [-3.0, 1.8, -46.5],
           fov: 46,
         },
         heading: 'The Interactive Orchestra',
-        body: 'Click the bronze steles on stage to isolate percussion, harmony, and lead vocal stems, or click the central lyre.',
+        body: 'Click the bronze steles on stage to isolate percussion, harmony, and lead vocal stems, or click the central lyre for audio.',
         cta: { text: 'Explore Sonic Identity', href: '/services/music-sonic-identity' },
       },
       {
-        // Beat 3: Theatrical overview of tiered stone seats and acoustic sails
-        at: 0.75,
+        // Beat 3: Elevated theatrical diagonal overview of Greek tiers and acoustic sails
+        at: 0.8,
         camera: {
-          position: [5.5, 4.8, -42],
-          target: [-3, 1.4, -48],
-          fov: 48,
+          position: [3.8, 4.5, -42],
+          target: [-3.0, 2.2, -50],
+          fov: 52,
         },
         heading: 'Theatrical Presence',
         body: 'From conceptual albums to brand audio logos and stage vocals. Engineered with the same discipline as code.',
@@ -279,7 +279,7 @@ export const STORY_CHAPTERS: StoryChapter[] = [
       {
         at: 0.0,
         camera: {
-          position: [0, 8, -58],
+          position: [0, 8, -60],
           target: [0, 14, -78],
           fov: 48,
         },
@@ -290,7 +290,7 @@ export const STORY_CHAPTERS: StoryChapter[] = [
       {
         at: 0.5,
         camera: {
-          position: [0, 12, -68],
+          position: [0, 12, -70],
           target: [0, 15, -78],
           fov: 44,
         },
