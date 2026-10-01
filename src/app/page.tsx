@@ -5,6 +5,7 @@ import { ExploreHUD } from '@/components/explore/ExploreHUD';
 import { CaseStudyPanelWrapper } from '@/components/overlays/CaseStudyPanelWrapper';
 import { NavigationMenu } from '@/components/ui/NavigationMenu';
 import { AudioOptInModal } from '@/components/audio/AudioOptInModal';
+import { VisibilityDebugger } from '@/components/debug/VisibilityDebugger';
 
 /**
  * Landing page — SSG HTML with dual-mode (Story / Explore) 3D experience.
@@ -26,6 +27,9 @@ export default function HomePage() {
 
       {/* Explore Mode HUD (Controls, Seals tracker, Waypoint Teleport, Modal) */}
       <ExploreHUD />
+
+      {/* Development Visibility & Performance Debugger */}
+      <VisibilityDebugger />
 
       {/* Case study slide-in panel */}
       <CaseStudyPanelWrapper />

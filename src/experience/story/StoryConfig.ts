@@ -153,25 +153,42 @@ export const STORY_CHAPTERS: StoryChapter[] = [
     title: 'Growth',
     zones: ['agora'],
     theme: 'light',
+    preloadZone: 'sanctuary',
     beats: [
       {
+        // Beat 1: Emerging through Forum exit gates, viewing Agora terrace marketplace
         at: 0.0,
         camera: {
-          position: [3, 4, -14],
-          target: [-2, 2, -22],
-          fov: 52,
+          position: [0.5, 3.2, -14.2],
+          target: [3.5, 1.8, -18.0],
+          fov: 50,
         },
         label: '03',
         heading: 'I Grow Digital Presence',
         body: 'Automation, digital campaigns, workflow optimization. Connecting tools, eliminating waste, building growth engines.',
       },
       {
-        at: 0.6,
+        // Beat 2: Gliding close to the Agora terrace, fountain, and stoa colonnade
+        at: 0.45,
         camera: {
-          position: [-3, 5, -20],
-          target: [0, 2, -28],
-          fov: 55,
+          position: [2.0, 2.4, -16.0],
+          target: [3.5, 1.6, -18.2],
+          fov: 46,
         },
+        heading: 'Scalable Growth Architecture',
+        body: 'From automated webhook pipelines to conversion infrastructure. Designing systems that scale operations without human bottlenecks.',
+        cta: { text: 'Explore Growth Systems', href: '/services/automation' },
+      },
+      {
+        // Beat 3: Gliding onward along the royal trail towards Fossil Arch entrance
+        at: 0.85,
+        camera: {
+          position: [0.0, 2.2, -18.5],
+          target: [0.0, 2.2, -24.0],
+          fov: 50,
+        },
+        heading: 'Towards Primeval Worlds',
+        body: 'Following the stone road past the marketplace into the secluded primeval canyon basin.',
       },
     ],
   },
@@ -277,21 +294,23 @@ export const STORY_CHAPTERS: StoryChapter[] = [
     theme: 'accent',
     beats: [
       {
+        // Beat 1: Cresting above the Amphitheatre wall, viewing the mountain peak & Beacon
         at: 0.0,
         camera: {
-          position: [0, 8, -60],
-          target: [0, 14, -78],
+          position: [0, 8.0, -66.0],
+          target: [0, 14.0, -78.0],
           fov: 48,
         },
         label: '06',
         heading: "Let's Build Something",
-        body: "Whether you need a digital system, a creative experience, or an original score — the signal is lit.",
+        body: "Whether you need a digital system, a creative experience, or an original score — the signal is lit at the summit.",
       },
       {
+        // Beat 2: Rising to the Summit Belvedere platform, radiant signal beacon in view
         at: 0.5,
         camera: {
-          position: [0, 12, -70],
-          target: [0, 15, -78],
+          position: [0, 13.5, -73.5],
+          target: [0, 16.5, -78.0],
           fov: 44,
         },
         heading: 'Start a Conversation',

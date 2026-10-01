@@ -1,80 +1,99 @@
 'use client';
 
 // =============================================================================
-// Coastal Grass — wind-animated grass blades
+// Coastal Grass — High-performance InstancedMesh implementation
+// Reduces 106 separate <mesh> draw calls down to 1 SINGLE draw call!
+// Preserves exact deterministic blade placement, wind sway, and quality gates.
 // =============================================================================
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { useQualityStore } from '@/stores/useQualityStore';
+import { DETERMINISTIC_GRASS_BLADES } from './coastalGrassData';
 
-// Patches along beach edges and path borders — Y raised to sit ON ground
-const GRASS_PATCHES: Array<{ center: [number, number, number]; count: number; spread: number }> = [
-  // Beach edges
-  { center: [-8, 0.25, 8], count: 14, spread: 2 },
-  { center: [9, 0.2, 7], count: 12, spread: 2 },
-  { center: [-11, 0.2, 5], count: 10, spread: 1.5 },
-  { center: [11, 0.22, 6], count: 8, spread: 1.5 },
-  // Path borders (inland)
-  { center: [-2.5, 0.25, -5], count: 10, spread: 1.2 },
-  { center: [2.5, 0.25, -6], count: 10, spread: 1.2 },
-  { center: [-3, 0.2, -12], count: 12, spread: 1.5 },
-  { center: [3, 0.2, -10], count: 12, spread: 1.5 },
-  { center: [-2.5, 0.2, -18], count: 8, spread: 1 },
-  { center: [2.5, 0.2, -20], count: 8, spread: 1 },
-  // Near gate
-  { center: [-4, 0.3, 2], count: 6, spread: 0.8 },
-  { center: [4, 0.3, 2], count: 6, spread: 0.8 },
-];
+const dummy = new THREE.Object3D();
 
 export function CoastalGrass() {
-  const groupRef = useRef<THREE.Group>(null);
+  const meshRef = useRef<THREE.InstancedMesh>(null);
   const reducedMotion = useReducedMotion();
+  const tier = useQualityStore((s) => s.tier);
 
-  const blades = useMemo(() => {
-    const result: Array<{ pos: THREE.Vector3; rot: number; h: number; phase: number }> = [];
-    for (const patch of GRASS_PATCHES) {
-      for (let i = 0; i < patch.count; i++) {
-        const a = Math.random() * Math.PI * 2;
-        const d = Math.random() * patch.spread;
-        result.push({
-          pos: new THREE.Vector3(
-            patch.center[0] + Math.cos(a) * d,
-            patch.center[1],
-            patch.center[2] + Math.sin(a) * d,
-          ),
-          rot: Math.random() * Math.PI,
-          h: 0.25 + Math.random() * 0.35,
-          phase: Math.random() * Math.PI * 2,
-        });
-      }
-    }
-    return result;
+  // Quality-tier density control:
+  // high: 100% (106 blades), medium: 60% (64 blades), low: 0 (disabled)
+  const activeBlades = useMemo(() => {
+    if (tier === 'low') return [];
+    if (tier === 'medium') return DETERMINISTIC_GRASS_BLADES.slice(0, 64);
+    return DETERMINISTIC_GRASS_BLADES;
+  }, [tier]);
+
+  const count = activeBlades.length;
+
+  // Single shared box geometry for grass blade
+  const geometry = useMemo(() => {
+    // Base box: 2cm wide, 1m tall (normalized for scaling), 0.5cm thick
+    const geo = new THREE.BoxGeometry(0.02, 1.0, 0.005);
+    // Shift origin to bottom of blade so rotation pivots from ground
+    geo.translate(0, 0.5, 0);
+    return geo;
   }, []);
 
-  useFrame(({ clock }) => {
-    if (reducedMotion || !groupRef.current) return;
-    const t = clock.elapsedTime;
-    groupRef.current.children.forEach((child, i) => {
-      if (i < blades.length) {
-        child.rotation.z = Math.sin(t * 1.8 + blades[i].phase) * 0.18;
-      }
+  // Shared PBR grass material
+  const material = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: '#4A7A3E',
+      roughness: 0.7,
+      metalness: 0.0,
+      side: THREE.DoubleSide,
     });
+  }, []);
+
+  // Initial matrix placement
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh || count === 0) return;
+
+    for (let i = 0; i < count; i++) {
+      const b = activeBlades[i];
+      dummy.position.set(b.x, b.y, b.z);
+      dummy.rotation.set(0, b.rotation, 0);
+      dummy.scale.set(1.0, b.height, 1.0);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+  }, [activeBlades, count]);
+
+  // Wind sway animation in useFrame
+  useFrame(({ clock }) => {
+    const mesh = meshRef.current;
+    if (!mesh || count === 0 || reducedMotion) return;
+
+    const t = clock.elapsedTime;
+
+    for (let i = 0; i < count; i++) {
+      const b = activeBlades[i];
+      const sway = Math.sin(t * 1.8 + b.phase) * 0.18;
+
+      dummy.position.set(b.x, b.y, b.z);
+      dummy.rotation.set(0, b.rotation, sway);
+      dummy.scale.set(1.0, b.height, 1.0);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
   });
 
+  if (count === 0) return null;
+
   return (
-    <group ref={groupRef}>
-      {blades.map((b, i) => (
-        <mesh key={i} position={b.pos} rotation={[0, b.rot, 0]}>
-          <boxGeometry args={[0.02, b.h, 0.005]} />
-          <meshStandardMaterial
-            color="#4A7A3E"
-            roughness={0.7}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-      ))}
-    </group>
+    <instancedMesh
+      ref={meshRef}
+      args={[geometry, material, count]}
+      castShadow={tier === 'high'}
+      receiveShadow
+    />
   );
 }

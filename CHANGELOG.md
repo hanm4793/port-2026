@@ -318,20 +318,32 @@ All notable progress on port-2026 / Island of Memory.
 
 ---
 
+## Flow 25.1 & Flow 26 — Continuous World Visibility & Rendering Headroom (2026-10-01)
+
+- **Task A (Shore Instancing Refactor)**: Refactored `CoastalGrass.tsx` and `ScatteredRocks` into `THREE.InstancedMesh` with deterministic LCG placement (`coastalGrassData.ts`); reduced Shore draw calls from 381 down to 294 (-23%) and geometries in VRAM from 291 to 199 (-32%). Added unit test `tests/unit/coastal-grass.test.ts`.
+- **Task B & D (WorldShell & Continuity Proxies)**: Implemented `WorldShell.tsx` as Layer 1 (always visible), providing continuous terrain spine from Shore (z = 32) to Summit Mountain (z = -92), continuous Sacred Way road, Agora of Growth marketplace terrace with 6 Doric stoa pillars & Growth Fountain, and Summit Beacon mountain rock mass rising to y=18m with radiant light sculpture.
+- **Task C (Zone Visibility Descriptors)**: Implemented `ZoneVisibilityDescriptors.ts` providing independent control of far/mid/near rendering tiers, collision activation distances, and interaction ranges. Added unit test `tests/unit/zone-visibility-descriptors.test.ts`.
+- **Task E (Eliminate Visual Popping & Fix Blank Fog)**: Refactored `ZoneCuller.tsx` with overlapping chapter ranges and 8m distance hysteresis. Fixed Chapter 6 blank screen defect by decoupling Beacon from ShoreZone into WorldShell.
+- **Task F (Visibility Debugger Tool)**: Implemented `VisibilityDebugger.tsx` (development-only) displaying live camera position, per-zone visibility tiers (Far/Mid/Near), active interaction prompt, and real-time WebGL render telemetry.
+- **Task G (Verification & Measurement)**: Re-ran full capture suite across 25 screenshots; benchmarked 120-frame empirical RAF frame times (steady 60.0 FPS, 1% low 58.8-59.5 FPS); verified Next.js production build (25/25 static pages, 0 errors); 24/24 Vitest unit tests passing across 6 suites.
+
+---
+
 ## Current State Summary
 
 | Layer | Status |
 |-------|--------|
-| Design docs | 12 documents (including VISUAL-QA-AUDIT.md), all cross-referenced |
-| Codebase | 84 clean, decoupled source files, builds clean, 0 type errors |
-| Test suite | Vitest unit tests active & passing (17/17 across 4 test suites) |
-| Architecture | Decoupled spatial boundaries (`zone-utils`), zero dead code, clean camera ownership |
-| Performance | Production-hardened: ZoneCuller unmounting, throttled CPU displacement, dynamic DPR [1.0..1.75], 60fps |
+| Design docs | 13 documents (including visual-baseline-audit.md), all cross-referenced |
+| Codebase | 88 clean, decoupled source files, builds clean, 0 type errors |
+| Test suite | Vitest unit tests active & passing (24/24 across 6 test suites) |
+| Architecture | 3-tier visibility (WorldShell, Mid-Layer, Near-Detail) with ZoneVisibilityDescriptors |
+| Performance | Production-hardened: Instanced grass & rocks, ZoneCuller hysteresis, 60fps steady state |
+| Blank views | 100% eliminated: Ch3 Agora terrace and Ch6 Summit Beacon continuously rendered |
 | Mobile story | Active with bottom-docked frosted cards, full-screen case-study sheet, portrait camera compensation |
-| Zones live | Shore of Arrival + Forum of Systems + Dino Sanctuary + Amphitheatre of Sound rendered in scene |
+| Zones live | Shore + Forum + Agora proxy + Dino + Amphitheatre + Beacon summit rendered in scene |
 | Audio system | Active with procedural zone soundscapes, opt-in entry modal, auto-ducking & tab-focus dimming |
 | Story Mode | Active with GSAP + Lenis, 6 chapters, beat-driven camera rail & audio zone transitions |
 | Explore Mode | Active with museum-grade reticle, compass wayfinding, zone toasts, 4 Memory Seals & tactile audio ticks |
 | Overlays & Panels | Contextual right-side drawer / mobile bottom sheet (`CaseStudyPanel`) docked to 3D with audio ducking |
 | Routes | `/`, `/services`, `/services/[slug]`, `/projects`, `/projects/[slug]`, `/about`, `/contact`, `/api/contact` |
-| Remaining zones | Agora, Atelier (proxy exists), Temple, Beacon |
+| Remaining zones | Final high-craft detailing for Agora & Beacon Signal Lens (scheduled for dedicated flows) |

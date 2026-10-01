@@ -11,8 +11,7 @@
 // - Rocks raised to sit ON TOP of ground
 // - Grass raised to sit ON TOP of ground
 
-import { useRef, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 import { COLORS } from '@/lib/constants';
 import { SHORE_PALETTE } from './shoreConfig';
@@ -32,7 +31,6 @@ export function ShoreZone() {
       <PathInland />
       <ScatteredRocks />
       <CoastalGrass />
-      <BeaconSilhouette />
       <ShoreLighting />
     </group>
   );
@@ -143,35 +141,52 @@ function StoneSteps() {
   );
 }
 
-// ─── Scattered rocks ────────────────────────────────────────────────────
-// Raised Y so they sit on top of the flat ground
+// ─── Scattered rocks (InstancedMesh: 11 rocks in 1 draw call) ───────────
+
+const ROCKS_DATA = [
+  { x: -9, z: 6, s: 0.7 }, { x: 10, z: 8, s: 0.55 }, { x: -11, z: 4, s: 0.9 },
+  { x: 8, z: 5, s: 0.45 }, { x: -6, z: 12, s: 0.4 }, { x: 12, z: 10, s: 0.6 },
+  { x: -13, z: 9, s: 0.8 }, { x: -7, z: 2, s: 0.55 }, { x: 7, z: 2, s: 0.5 },
+  { x: -5, z: 14, s: 0.6 }, { x: 6, z: 13, s: 0.45 },
+] as const;
 
 function ScatteredRocks() {
-  const rocks = useMemo(() => [
-    // Beach area rocks only (z > 0)
-    { x: -9, z: 6, s: 0.7 }, { x: 10, z: 8, s: 0.55 }, { x: -11, z: 4, s: 0.9 },
-    { x: 8, z: 5, s: 0.45 }, { x: -6, z: 12, s: 0.4 }, { x: 12, z: 10, s: 0.6 },
-    { x: -13, z: 9, s: 0.8 }, { x: -7, z: 2, s: 0.55 }, { x: 7, z: 2, s: 0.5 },
-    { x: -5, z: 14, s: 0.6 }, { x: 6, z: 13, s: 0.45 },
-  ], []);
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+
+  const geometry = useMemo(() => new THREE.DodecahedronGeometry(1.0, 0), []);
+  const material = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: COLORS.stoneShadow,
+        roughness: 0.85,
+      }),
+    [],
+  );
+
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+
+    const dummy = new THREE.Object3D();
+    ROCKS_DATA.forEach(({ x, z, s }, i) => {
+      dummy.position.set(x, s * 0.35, z);
+      dummy.rotation.set(0.15, x * 0.3 + z * 0.2, 0.08);
+      dummy.scale.setScalar(s * 0.45);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    });
+
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
+  }, []);
 
   return (
-    <group>
-      {rocks.map(({ x, z, s }, i) => (
-        <mesh
-          key={i}
-          position={[x, s * 0.35, z]}
-          rotation={[0.15, x * 0.3 + z * 0.2, 0.08]}
-          castShadow
-        >
-          <dodecahedronGeometry args={[s * 0.45, 0]} />
-          <meshStandardMaterial
-            color={i % 3 === 0 ? COLORS.stoneShadow : SHORE_PALETTE.sandDark}
-            roughness={0.85}
-          />
-        </mesh>
-      ))}
-    </group>
+    <instancedMesh
+      ref={meshRef}
+      args={[geometry, material, ROCKS_DATA.length]}
+      castShadow
+      receiveShadow
+    />
   );
 }
 
@@ -196,45 +211,6 @@ function PathInland() {
           </mesh>
         )),
       )}
-    </group>
-  );
-}
-
-// ─── Beacon ─────────────────────────────────────────────────────────────
-
-function BeaconSilhouette() {
-  const lightRef = useRef<THREE.PointLight>(null);
-
-  useFrame(({ clock }) => {
-    if (lightRef.current) {
-      lightRef.current.intensity = 6 + Math.sin(clock.elapsedTime * 0.5) * 2;
-    }
-  });
-
-  return (
-    <group position={[0, 14, -78]}>
-      <mesh>
-        <boxGeometry args={[1.0, 16, 1.0]} />
-        <meshStandardMaterial color={COLORS.volcanicCharcoal} roughness={0.6} />
-      </mesh>
-      <pointLight
-        ref={lightRef}
-        position={[0, 9, 0]}
-        color={COLORS.goldLeaf}
-        intensity={6}
-        distance={150}
-        decay={2}
-      />
-      <mesh position={[0, 9, 0]}>
-        <sphereGeometry args={[0.6, 8, 8]} />
-        <meshStandardMaterial
-          color={COLORS.goldLeaf}
-          emissive={COLORS.goldLeaf}
-          emissiveIntensity={3.2}
-          transparent
-          opacity={0.9}
-        />
-      </mesh>
     </group>
   );
 }

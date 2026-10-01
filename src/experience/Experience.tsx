@@ -10,13 +10,14 @@
 
 import { Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Preload, Stats, OrbitControls } from '@react-three/drei';
+import { Preload, Stats } from '@react-three/drei';
 import { worldManager } from '@/experience/world/WorldManager';
 import { useQualityStore } from '@/stores/useQualityStore';
 import { useExperienceStore } from '@/stores/useExperienceStore';
 import { Sky } from './environment/Sky';
 import { Lighting } from './environment/Lighting';
 import { Fog } from './environment/Fog';
+import { WorldShell } from './world/WorldShell';
 import { ShoreZone } from './zones/shore/ShoreZone';
 import { ForumZone } from './zones/forum/ForumZone';
 import { DinoSanctuaryZone } from './zones/sanctuary/DinoSanctuaryZone';
@@ -74,6 +75,9 @@ export function Experience() {
           SHORE_CAMERAS.hero.target[1],
           SHORE_CAMERAS.hero.target[2],
         );
+        if (typeof window !== 'undefined') {
+          (window as unknown as { __THREE_GL__?: unknown }).__THREE_GL__ = gl;
+        }
       }}
     >
       <Suspense fallback={null}>
@@ -81,20 +85,23 @@ export function Experience() {
         <Lighting />
         <Fog />
 
-        {/* ── Spatial Zone Containers (Lazy-Mounted / Culled by Distance) ──── */}
-        <ZoneCuller zoneKey="shore" zoneZCenter={10.0}>
+        {/* ── Layer 1: WorldShell (Always Mounted & Visible Continuous World Backbone) ── */}
+        <WorldShell />
+
+        {/* ── Layer 2 & 3: Zone Mid & Near Architecture (Overlapping Distance Hysteresis) ── */}
+        <ZoneCuller zoneKey="shore">
           <ShoreZone />
         </ZoneCuller>
 
-        <ZoneCuller zoneKey="forum" zoneZCenter={-9.0}>
+        <ZoneCuller zoneKey="forum">
           <ForumZone />
         </ZoneCuller>
 
-        <ZoneCuller zoneKey="sanctuary" zoneZCenter={-29.0}>
+        <ZoneCuller zoneKey="sanctuary">
           <DinoSanctuaryZone />
         </ZoneCuller>
 
-        <ZoneCuller zoneKey="amphitheatre" zoneZCenter={-50.0}>
+        <ZoneCuller zoneKey="amphitheatre">
           <AmphitheatreZone />
         </ZoneCuller>
 

@@ -1,0 +1,134 @@
+[
+  {
+    "checkpoint": "Shore of Arrival (Ch1)",
+    "scrollRatio": 0,
+    "avgFPS": 60,
+    "avgFrameTimeMs": 16.67,
+    "onePercentLowFPS": 59.5,
+    "p99FrameTimeMs": 16.8,
+    "minFrameTimeMs": 16.4,
+    "maxFrameTimeMs": 16.9,
+    "calls": 294,
+    "triangles": 22330,
+    "geometries": 199,
+    "textures": 7,
+    "programs": 32,
+    "tier": "unknown",
+    "shadows": false,
+    "dpr": [
+      1,
+      1
+    ],
+    "mode": "story"
+  },
+  {
+    "checkpoint": "Forum of Systems (Ch2)",
+    "scrollRatio": 0.25,
+    "avgFPS": 60,
+    "avgFrameTimeMs": 16.67,
+    "onePercentLowFPS": 59.2,
+    "p99FrameTimeMs": 16.9,
+    "minFrameTimeMs": 16.4,
+    "maxFrameTimeMs": 16.9,
+    "calls": 445,
+    "triangles": 29400,
+    "geometries": 274,
+    "textures": 9,
+    "programs": 48,
+    "tier": "unknown",
+    "shadows": false,
+    "dpr": [
+      1,
+      1
+    ],
+    "mode": "story"
+  },
+  {
+    "checkpoint": "Growth / Agora Gap (Ch3)",
+    "scrollRatio": 0.4,
+    "avgFPS": 41.6,
+    "avgFrameTimeMs": 24.03,
+    "onePercentLowFPS": 58.5,
+    "p99FrameTimeMs": 17.1,
+    "minFrameTimeMs": 16.3,
+    "maxFrameTimeMs": 899.9,
+    "calls": 355,
+    "triangles": 33738,
+    "geometries": 303,
+    "textures": 11,
+    "programs": 46,
+    "tier": "unknown",
+    "shadows": false,
+    "dpr": [
+      1,
+      1
+    ],
+    "mode": "story"
+  },
+  {
+    "checkpoint": "Dino Sanctuary (Ch4)",
+    "scrollRatio": 0.55,
+    "avgFPS": 60,
+    "avgFrameTimeMs": 16.67,
+    "onePercentLowFPS": 59.5,
+    "p99FrameTimeMs": 16.8,
+    "minFrameTimeMs": 16.5,
+    "maxFrameTimeMs": 16.8,
+    "calls": 387,
+    "triangles": 35132,
+    "geometries": 298,
+    "textures": 11,
+    "programs": 50,
+    "tier": "unknown",
+    "shadows": false,
+    "dpr": [
+      1,
+      1
+    ],
+    "mode": "story"
+  },
+  {
+    "checkpoint": "Amphitheatre of Sound (Ch5)",
+    "scrollRatio": 0.76,
+    "avgFPS": 60,
+    "avgFrameTimeMs": 16.67,
+    "onePercentLowFPS": 59.2,
+    "p99FrameTimeMs": 16.9,
+    "minFrameTimeMs": 16.4,
+    "maxFrameTimeMs": 17,
+    "calls": 222,
+    "triangles": 30696,
+    "geometries": 195,
+    "textures": 11,
+    "programs": 54,
+    "tier": "unknown",
+    "shadows": false,
+    "dpr": [
+      1,
+      1
+    ],
+    "mode": "story"
+  },
+  {
+    "checkpoint": "Invitation / Beacon Gap (Ch6)",
+    "scrollRatio": 0.95,
+    "avgFPS": 60,
+    "avgFrameTimeMs": 16.67,
+    "onePercentLowFPS": 59.2,
+    "p99FrameTimeMs": 16.9,
+    "minFrameTimeMs": 16.4,
+    "maxFrameTimeMs": 16.9,
+    "calls": 55,
+    "triangles": 15048,
+    "geometries": 115,
+    "textures": 9,
+    "programs": 50,
+    "tier": "unknown",
+    "shadows": false,
+    "dpr": [
+      1,
+      1
+    ],
+    "mode": "story"
+  }
+]

@@ -130,6 +130,13 @@ interface ExploreState {
 
 let toastTimeout: NodeJS.Timeout | null = null;
 
+function mapToAudioZone(zoneId: string): 'shore' | 'forum' | 'sanctuary' | 'amphitheatre' {
+  if (zoneId === 'agora') return 'forum';
+  if (zoneId === 'beacon') return 'amphitheatre';
+  if (zoneId === 'forum' || zoneId === 'sanctuary' || zoneId === 'amphitheatre') return zoneId;
+  return 'shore';
+}
+
 export const useExploreStore = create<ExploreState>((set, get) => ({
   playerPosition: [0, 1.2, 5.0],
   playerRotationY: 0,
@@ -168,7 +175,7 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
       }, 3400);
 
       // Sync Audio Zone
-      useAudioStore.getState().setZone(zoneId);
+      useAudioStore.getState().setZone(mapToAudioZone(zoneId));
     }
 
     set({
@@ -224,7 +231,7 @@ export const useExploreStore = create<ExploreState>((set, get) => ({
       }, 3400);
 
       // Sync Audio Zone
-      useAudioStore.getState().setZone(zoneId);
+      useAudioStore.getState().setZone(mapToAudioZone(zoneId));
     }
   },
 }));

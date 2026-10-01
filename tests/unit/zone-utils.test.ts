@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { resolveZoneFromZ, computeBeaconHeading, ZONE_BOUNDARIES } from '@/lib/zone-utils';
 
 describe('Zone Navigation & Spatial Decoupling Utilities', () => {
-  it('correctly maps world Z coordinate to distinct territory boundaries', () => {
+  it('correctly maps world Z coordinate to distinct territory boundaries across all 6 zones', () => {
     // Shore (z = 10)
     const shore = resolveZoneFromZ(10.0);
     expect(shore.id).toBe('shore');
@@ -15,6 +15,12 @@ describe('Zone Navigation & Spatial Decoupling Utilities', () => {
     expect(forum.name).toBe('Forum of Systems');
     expect(forum.groundElevation).toBe(1.2);
 
+    // Agora (z = -18)
+    const agora = resolveZoneFromZ(-18.0);
+    expect(agora.id).toBe('agora');
+    expect(agora.name).toBe('Agora of Growth');
+    expect(agora.groundElevation).toBe(1.05);
+
     // Dino Sanctuary (z = -28)
     const dino = resolveZoneFromZ(-28.0);
     expect(dino.id).toBe('sanctuary');
@@ -26,6 +32,12 @@ describe('Zone Navigation & Spatial Decoupling Utilities', () => {
     expect(amphi.id).toBe('amphitheatre');
     expect(amphi.name).toBe('Amphitheatre of Sound');
     expect(amphi.groundElevation).toBe(1.35);
+
+    // Beacon (z = -75)
+    const beacon = resolveZoneFromZ(-75.0);
+    expect(beacon.id).toBe('beacon');
+    expect(beacon.name).toBe('Beacon of Contact');
+    expect(beacon.groundElevation).toBe(4.5);
   });
 
   it('computes accurate lodestone compass heading towards Summit Beacon [0, 14, -78]', () => {
@@ -42,8 +54,8 @@ describe('Zone Navigation & Spatial Decoupling Utilities', () => {
     expect(Math.round(eastHeading)).toBe(90);
   });
 
-  it('validates all 4 active zones have sequential continuous boundaries without gaps', () => {
-    expect(ZONE_BOUNDARIES.length).toBe(4);
+  it('validates all 6 active zones have sequential continuous boundaries without gaps', () => {
+    expect(ZONE_BOUNDARIES.length).toBe(6);
     for (let i = 0; i < ZONE_BOUNDARIES.length - 1; i++) {
       expect(ZONE_BOUNDARIES[i].minZ).toBe(ZONE_BOUNDARIES[i + 1].maxZ);
     }

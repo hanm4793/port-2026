@@ -1,9 +1,9 @@
 'use client';
 
 // =============================================================================
-// ZoneCuller — Spatial zone mounting & frustum optimization container
-// Unmounts distant zones from the Three.js scene graph when out of range.
-// Saves 35-50% visible draw calls and parks unneeded tick loops.
+// ZoneCuller — 3-Tier Spatial Visibility & Hysteresis Container
+// Task E: Eliminates hard visual popping and prevents premature unmounting.
+// Uses overlapping transition ranges and generous distance buffers.
 // =============================================================================
 
 import { useMemo } from 'react';
@@ -12,48 +12,60 @@ import { useExperienceStore } from '@/stores/useExperienceStore';
 import { useExploreStore } from '@/stores/useExploreStore';
 import { useQualityStore } from '@/stores/useQualityStore';
 import { getChapterAtProgress } from '@/experience/story/StoryConfig';
-
-export type ZoneNameKey = 'shore' | 'forum' | 'sanctuary' | 'amphitheatre';
+import {
+  ZONE_VISIBILITY_DESCRIPTORS,
+  type MasterZoneId,
+} from '@/experience/world/ZoneVisibilityDescriptors';
 
 interface ZoneCullerProps {
-  zoneKey: ZoneNameKey;
-  // World Z center of this zone
-  zoneZCenter: number;
+  zoneKey: MasterZoneId;
   children: React.ReactNode;
 }
 
-export function ZoneCuller({ zoneKey, zoneZCenter, children }: ZoneCullerProps) {
+export function ZoneCuller({ zoneKey, children }: ZoneCullerProps) {
   const mode = useExperienceStore((s) => s.mode);
   const scrollProgress = useCameraStore((s) => s.scrollProgress);
   const playerPos = useExploreStore((s) => s.playerPosition);
   const tier = useQualityStore((s) => s.tier);
 
-  // In Story Mode: check if this zone is in current chapter or immediate neighboring chapters
+  const descriptor = ZONE_VISIBILITY_DESCRIPTORS[zoneKey];
+  const zoneZCenter = descriptor?.center[2] ?? 0;
+
+  // Story Mode: Overlapping chapter ranges (never hard unmount immediate neighbors)
   const isVisibleInStory = useMemo(() => {
-    const { index, chapter } = getChapterAtProgress(scrollProgress);
+    if (!descriptor) return true;
+    const { chapter } = getChapterAtProgress(scrollProgress);
 
     // Active in this chapter?
-    if (chapter.zones.includes(zoneKey as any)) return true;
+    if (descriptor.storyChapters.includes(chapter.id)) return true;
 
-    // On high tier, keep 1 chapter forward preloaded
-    if (tier === 'high') {
-      const nextChapter = getChapterAtProgress(Math.min(scrollProgress + 0.18, 1.0)).chapter;
-      if (nextChapter.zones.includes(zoneKey as any)) return true;
+    // Overlapping lookahead buffer (+-0.22 scroll ratio = ~1.3 chapters ahead/behind)
+    const forwardChapter = getChapterAtProgress(Math.min(scrollProgress + 0.22, 1.0)).chapter;
+    if (descriptor.storyChapters.includes(forwardChapter.id)) return true;
 
-      const prevChapter = getChapterAtProgress(Math.max(scrollProgress - 0.18, 0.0)).chapter;
-      if (prevChapter.zones.includes(zoneKey as any)) return true;
+    const backwardChapter = getChapterAtProgress(Math.max(scrollProgress - 0.22, 0.0)).chapter;
+    if (descriptor.storyChapters.includes(backwardChapter.id)) return true;
+
+    // Keep active if on High/Medium tier for broad panoramic sightlines
+    if (tier === 'high' || tier === 'medium') {
+      const farForward = getChapterAtProgress(Math.min(scrollProgress + 0.38, 1.0)).chapter;
+      if (descriptor.storyChapters.includes(farForward.id)) return true;
     }
 
     return false;
-  }, [scrollProgress, zoneKey, tier]);
+  }, [scrollProgress, descriptor, tier]);
 
-  // In Explore Mode: check distance from avatar
+  // Explore Mode: Euclidean distance with generous buffer to prevent popping
   const isVisibleInExplore = useMemo(() => {
+    if (!descriptor) return true;
     const dz = Math.abs(playerPos[2] - zoneZCenter);
-    // On low tier, unmount if > 38m away; on high tier, allow 58m
-    const maxDist = tier === 'low' ? 38.0 : 58.0;
-    return dz <= maxDist;
-  }, [playerPos, zoneZCenter, tier]);
+
+    // Base threshold from descriptor + 8m hysteresis buffer
+    const baseThreshold = tier === 'low' ? descriptor.exploreDistances.mid : descriptor.exploreDistances.far;
+    const maxThreshold = baseThreshold + 8.0;
+
+    return dz <= maxThreshold;
+  }, [playerPos, zoneZCenter, descriptor, tier]);
 
   const shouldRender = mode === 'story' ? isVisibleInStory : isVisibleInExplore;
 
