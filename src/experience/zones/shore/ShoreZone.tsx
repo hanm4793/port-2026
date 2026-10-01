@@ -213,30 +213,30 @@ function BeaconSilhouette() {
 
   useFrame(({ clock }) => {
     if (lightRef.current) {
-      lightRef.current.intensity = 5 + Math.sin(clock.elapsedTime * 0.5) * 2;
+      lightRef.current.intensity = 6 + Math.sin(clock.elapsedTime * 0.5) * 2;
     }
   });
 
   return (
-    <group position={[0, 5, -45]}>
+    <group position={[0, 14, -78]}>
       <mesh>
-        <boxGeometry args={[0.7, 10, 0.7]} />
+        <boxGeometry args={[1.0, 16, 1.0]} />
         <meshStandardMaterial color={COLORS.volcanicCharcoal} roughness={0.6} />
       </mesh>
       <pointLight
         ref={lightRef}
-        position={[0, 6, 0]}
+        position={[0, 9, 0]}
         color={COLORS.goldLeaf}
-        intensity={5}
-        distance={100}
+        intensity={6}
+        distance={150}
         decay={2}
       />
-      <mesh position={[0, 6, 0]}>
-        <sphereGeometry args={[0.4, 8, 8]} />
+      <mesh position={[0, 9, 0]}>
+        <sphereGeometry args={[0.6, 8, 8]} />
         <meshStandardMaterial
           color={COLORS.goldLeaf}
           emissive={COLORS.goldLeaf}
-          emissiveIntensity={3}
+          emissiveIntensity={3.2}
           transparent
           opacity={0.9}
         />

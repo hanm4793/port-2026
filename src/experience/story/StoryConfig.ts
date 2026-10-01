@@ -228,25 +228,43 @@ export const STORY_CHAPTERS: StoryChapter[] = [
     title: 'Art & Music',
     zones: ['amphitheatre', 'temple'],
     theme: 'light',
+    preloadZone: 'beacon',
     beats: [
       {
+        // Beat 1: Cresting the ridge, viewing the amphitheatre below
         at: 0.0,
         camera: {
-          position: [-4, 4, -30],
-          target: [0, 3, -38],
+          position: [-3, 6.5, -38],
+          target: [-3, 1.2, -48],
           fov: 52,
         },
         label: '05',
-        heading: 'I Create',
-        body: 'Original music, sonic identity, photography, and creative technology. Technical precision meeting artistic expression.',
+        heading: 'Resonances in Stone',
+        body: 'Music is the invisible architecture of emotion. Merging classical composition, analog synthesis, and live vocal performance.',
       },
       {
-        at: 0.6,
+        // Beat 2: Stage close-up with sound-reactive concentric rings & stem steles
+        at: 0.35,
         camera: {
-          position: [0, 5, -36],
-          target: [0, 4, -42],
-          fov: 50,
+          position: [-3, 2.2, -42.5],
+          target: [-3, 1.6, -47],
+          fov: 46,
         },
+        heading: 'The Interactive Orchestra',
+        body: 'Click the bronze steles on stage to isolate percussion, harmony, and lead vocal stems, or click the central lyre.',
+        cta: { text: 'Explore Sonic Identity', href: '/services/music-sonic-identity' },
+      },
+      {
+        // Beat 3: Theatrical overview of tiered stone seats and acoustic sails
+        at: 0.75,
+        camera: {
+          position: [5.5, 4.8, -42],
+          target: [-3, 1.4, -48],
+          fov: 48,
+        },
+        heading: 'Theatrical Presence',
+        body: 'From conceptual albums to brand audio logos and stage vocals. Engineered with the same discipline as code.',
+        cta: { text: 'View Sound Case Study', href: '/projects/speculative-soundtracks-vol1' },
       },
     ],
   },
@@ -261,23 +279,23 @@ export const STORY_CHAPTERS: StoryChapter[] = [
       {
         at: 0.0,
         camera: {
-          position: [0, 5, -38],
-          target: [0, 10, -45],
+          position: [0, 8, -58],
+          target: [0, 14, -78],
           fov: 48,
         },
         label: '06',
         heading: "Let's Build Something",
-        body: "Whether you need a digital system, a creative experience, or something without a name yet — the signal is lit.",
+        body: "Whether you need a digital system, a creative experience, or an original score — the signal is lit.",
       },
       {
         at: 0.5,
         camera: {
-          position: [0, 7, -42],
-          target: [0, 11, -45],
-          fov: 42,
+          position: [0, 12, -68],
+          target: [0, 15, -78],
+          fov: 44,
         },
         heading: 'Start a Conversation',
-        cta: { text: 'Get in Touch', href: '/contact' },
+        cta: { text: 'Transmit Project Brief', href: '/contact' },
       },
     ],
   },

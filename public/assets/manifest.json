@@ -187,6 +187,39 @@
       "textureBudget": "none",
       "proxyType": "pulsing-plane",
       "description": "Mineral basin with glowing teal water and amber spore crystals"
+    },
+    {
+      "id": "amphitheatre-acoustic-stage",
+      "category": "landmark",
+      "zone": "amphitheatre",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 3500,
+      "textureBudget": "1024x1024",
+      "proxyType": "composed-primitives",
+      "description": "Circular marble orchestra with sound-reactive concentric rings & 3 stem steles"
+    },
+    {
+      "id": "amphitheatre-tiered-seating",
+      "category": "env-kit",
+      "zone": "amphitheatre",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 4500,
+      "textureBudget": "2048x2048",
+      "proxyType": "arc-cylinders",
+      "description": "5 semicircular Greek limestone tiers with radial access stairways and steles"
+    },
+    {
+      "id": "amphitheatre-echo-wall",
+      "category": "env-kit",
+      "zone": "amphitheatre",
+      "status": "proxy",
+      "file": null,
+      "polyBudget": 2500,
+      "textureBudget": "1024x1024",
+      "proxyType": "composed-primitives",
+      "description": "Curved acoustic Skene wall with carved wave reliefs and suspended linen sails"
     }
   ]
 }

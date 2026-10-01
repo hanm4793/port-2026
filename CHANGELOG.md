@@ -198,16 +198,31 @@ All notable progress on port-2026 / Island of Memory.
 
 ---
 
+## Step 17 — Prototype Amphitheatre of Sound Zone (2026-10-01)
+
+- Created `amphitheatreConfig.ts` with 6 named cameras, palette (limestone, resonant bronze, theatre spot), and 3-stem audio model (Percussion, Harmony, Vocals)
+- Implemented `AcousticStage.tsx`: circular marble orchestra with 3 concentric sound-reactive pulsing rings, central bronze lyre/relic, and 3 interactive stem steles (Percussion, Harmony, Lead Vocals)
+- Implemented `TieredSeating.tsx`: 5 semicircular Greek limestone tiers climbing the natural slope, with radial access stairways (klimakes) and top-tier acoustic steles
+- Implemented `EchoWall.tsx`: curved Skene wall with sound wave relief carvings and 3 suspended architectural linen acoustic reflector sails
+- Implemented `StageLighting.tsx`: dramatic theatrical key spotlight cutting down to the orchestra with soft penumbra, stage footlights, and twilight horizon fill
+- Assembled `AmphitheatreZone.tsx` with hillside base terrain and flanking coastal ridge rocks
+- Mounted `AmphitheatreZone` in `Experience.tsx` and moved `BeaconSilhouette` in `ShoreZone` further back to `z = -78` for authentic spatial depth
+- Synchronized Chapter 5 ("Art & Music") in `StoryConfig.ts` with 3 cinematic beats (Ridge Entrance, Stage Close-Up, Theatron Overview)
+- Updated `manifest.json` with 3 new amphitheatre assets
+- Verified build and dev server on port 3333
+
+---
+
 ## Current State Summary
 
 | Layer | Status |
 |-------|--------|
 | Design docs | 7 documents, all cross-referenced |
-| Codebase | 65+ source files, builds clean, 0 type errors |
-| Zones live | Shore of Arrival + Forum of Systems + Dino Sanctuary rendered in scene |
+| Codebase | 70+ source files, builds clean, 0 type errors |
+| Zones live | Shore of Arrival + Forum of Systems + Dino Sanctuary + Amphitheatre of Sound rendered in scene |
 | Story Mode | Active with GSAP + Lenis, 6 chapters, beat-driven camera rail |
 | Explore Mode | Toggleable via Shore orb or UI, activates OrbitControls |
 | Overlays & Panels | Contextual right-side drawer (`CaseStudyPanel`) docked to 3D |
 | Routes | `/`, `/services`, `/services/[slug]`, `/projects`, `/projects/[slug]`, `/about`, `/contact`, `/api/contact` |
-| Remaining zones | Agora, Atelier (proxy exists), Amphitheatre, Temple, Beacon |
+| Remaining zones | Agora, Atelier (proxy exists), Temple, Beacon |
 | Mobile experience | Responsive DOM shell ready, dedicated mobile 2D scroll layout pending |
